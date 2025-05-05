@@ -1,10 +1,10 @@
-package bymyself.pj2.service;
+package supercoding.pj2.service;
 
-import bymyself.pj2.dto.response.CategoryDto;
-import bymyself.pj2.entity.Category;
-import bymyself.pj2.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import supercoding.pj2.dto.response.CategoryDto;
+import supercoding.pj2.entity.Category;
+import supercoding.pj2.repository.CategoryRepository;
 
 import java.util.List;
 

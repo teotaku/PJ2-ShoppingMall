@@ -1,13 +1,12 @@
-package bymyself.pj2.controller;
+package supercoding.pj2.controller;
 
 
-import bymyself.pj2.dto.response.CategoryDto;
-import bymyself.pj2.entity.Category;
-import bymyself.pj2.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import supercoding.pj2.dto.response.CategoryDto;
+import supercoding.pj2.service.CategoryService;
 
 import java.util.List;
 
