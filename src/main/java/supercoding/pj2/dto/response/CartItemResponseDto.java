@@ -9,17 +9,13 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
+public class CartItemResponseDto {
 
     private Long id;
+    private Long productId;
     private String name;
     private BigDecimal price;
-    private String description;
-    public String imageUrl;
-    private int stock;
-    private int viewCount;
-    private int purchaseCount;
-    private int popularityScore;
+    private int quantity;
 
 
 }

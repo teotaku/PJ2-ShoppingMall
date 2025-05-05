@@ -1,18 +1,15 @@
-package bymyself.pj2.controller;
+package supercoding.pj2.controller;
 
 
-import bymyself.pj2.dto.request.ProductSearchCondition;
-import bymyself.pj2.dto.response.ProductResponseDto;
-import bymyself.pj2.entity.Product;
-import bymyself.pj2.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import supercoding.pj2.dto.request.ProductRequestDto;
+import supercoding.pj2.dto.request.ProductSearchCondition;
+import supercoding.pj2.dto.response.ProductResponseDto;
+import supercoding.pj2.service.ProductService;
 
 @RestController
 @RequestMapping("/products")
@@ -44,5 +41,26 @@ public class ProductController {
     @GetMapping("/id")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
+    }
+
+    //상품 등록
+    @PostMapping
+    public ResponseEntity<Void> create(@RequestBody ProductRequestDto dto) {
+        productService.createProduct(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    //상품 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody ProductRequestDto dto) {
+        productService.updateProduct(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    //인기순,조회수,구매수 상품 조회(기본값 인기수)
+    @GetMapping("/sorted")
+    public ResponseEntity<Page<ProductResponseDto>> sorted(ProductSearchCondition condition) {
+        return ResponseEntity.ok(productService.getSortedProducts(condition));
+
     }
 }

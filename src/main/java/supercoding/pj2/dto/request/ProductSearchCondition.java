@@ -1,4 +1,4 @@
-package bymyself.pj2.dto.request;
+package supercoding.pj2.dto.request;
 
 
 import lombok.Getter;
