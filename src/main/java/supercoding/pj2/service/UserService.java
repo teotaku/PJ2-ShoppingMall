@@ -19,4 +19,8 @@ public class UserService
         userRepository.save(user);
     }
 
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(email);
+    }
+
 }

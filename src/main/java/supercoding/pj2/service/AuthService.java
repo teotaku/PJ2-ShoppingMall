@@ -3,9 +3,9 @@ package supercoding.pj2.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import supercoding.pj2.dto.request.LoginRequest;
-import supercoding.pj2.dto.request.SignupRequest;
-import supercoding.pj2.dto.response.LoginResponse;
+import supercoding.pj2.dto.request.LoginRequestDto;
+import supercoding.pj2.dto.request.SignupRequestDto;
+import supercoding.pj2.dto.response.LoginResponseDto;
 import supercoding.pj2.entity.User;
 import supercoding.pj2.exception.UnauthorizedException;
 import supercoding.pj2.repository.UserRepository;
@@ -19,7 +19,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public void signup(SignupRequest request) {
+    public void signup(SignupRequestDto request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
@@ -34,7 +34,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("이메일 또는 비밀번호가 틀렸습니다."));
 
@@ -43,6 +43,6 @@ public class AuthService {
         }
 
         String token = jwtProvider.generateToken(user.getId(), user.getEmail(), user.getProvider().name());
-        return new LoginResponse(token);
+        return new LoginResponseDto(token);
     }
 }
