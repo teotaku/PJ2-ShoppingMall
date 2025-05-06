@@ -2,7 +2,12 @@ package supercoding.pj2.entity;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Table(name = "orders")
 @Entity
 public class Order extends BaseEntity{

@@ -33,8 +33,9 @@ public class Product {
     @Column(name = "category_id")
     private Long categoryId;
 
-
+    @Builder.Default
     private int viewCount = 0; //조회수
+    @Builder.Default
     private int purchaseCount = 0; //구매수
 
     public int getPopularityScore() { //인기수 조회 << 조회수1 구매수5 비율로 설정.
