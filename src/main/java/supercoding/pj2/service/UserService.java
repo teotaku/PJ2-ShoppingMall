@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import supercoding.pj2.entity.User;
 import supercoding.pj2.repository.UserRepository;
 
-@RequiredArgsConstructor
 @Service
-public class UserService
-{
+@RequiredArgsConstructor
+public class UserService {
+
     private final UserRepository userRepository;
 
     public void softDelete(String email) {

@@ -45,8 +45,8 @@ public class CartItemController {
 
     //장바구니 결제 처리
     @PostMapping("/checkout")
-    public ResponseEntity<Void> checkout(@RequestParam Long userId) {
-        cartService.checkout(userId);
+    public ResponseEntity<Void> checkout(@RequestParam Long userId,String shippingAddress) {
+        cartService.checkout(userId,shippingAddress);
         return ResponseEntity.ok().build();
     }
 }

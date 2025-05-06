@@ -12,6 +12,7 @@ import supercoding.pj2.entity.CartItem;
 import supercoding.pj2.entity.Product;
 import supercoding.pj2.repository.CartItemRepository;
 import supercoding.pj2.repository.CartRepository;
+import supercoding.pj2.repository.OrderRepository;
 import supercoding.pj2.repository.ProductRepository;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class CartService {
 
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
-    private CartRepository cartRepository;
+    private final OrderService orderService;
+    private final CartRepository cartRepository;
 
     //장바구니에 상품 추가
     public void addItem(Long userId, CartItemRequestDto dto) {
@@ -75,7 +77,7 @@ public class CartService {
     }
 
     //장바구니 결제 처리: 재고 감소 + 장바구니 비움
-    public void checkout(Long userId) {
+    public void checkout(Long userId,String shippingAddress) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("장바구니가 없습니다."));
 
@@ -89,6 +91,11 @@ public class CartService {
             }
             product.decreaseStock(item.getQuantity()); //재고차감
         }
+
+        //주문생성
+        orderService.createOrder(userId, items, shippingAddress);
+
+
         cartItemRepository.deleteAll(items); //결제후 장바구니 전부 비움.
     }
 
