@@ -1,21 +1,20 @@
 package supercoding.pj2.dto.response;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 @Getter
-public class OrderItemResponseDto {
+public class RecentOrderDto {
 
-    private String name;
+    private String productName;
     private String imageUrl;
-    private BigDecimal price;
-    private int quantity;
     private String color;
+    private int quantity;
+    private BigDecimal price;
 
 }

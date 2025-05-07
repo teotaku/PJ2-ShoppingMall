@@ -16,6 +16,7 @@ public class ProductRequestDto {
     private Long categoryId;
     private String description;
     private String imageUrl;
+    private String color;
 
 
 
@@ -27,6 +28,7 @@ public class ProductRequestDto {
                 .categoryId(categoryId)
                 .description(description)
                 .imageUrl(imageUrl)
+                .color(color)
                 .build();
 
     }
