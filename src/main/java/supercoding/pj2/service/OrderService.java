@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import supercoding.pj2.dto.response.OrderItemResponseDto;
 import supercoding.pj2.dto.response.OrderResponseDto;
 import supercoding.pj2.entity.*;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -49,7 +51,10 @@ public class OrderService {
                     return OrderItem.builder()
                             .orderId(order.getId())
                             .productId(product.getId())
+                            .name(product.getName())
                             .quantity(item.getQuantity())
+                            .imageUrl(product.getImageUrl())
+                            .color(product.getColor())
                             .price(product.getPrice())
                             .build();
                 }).toList();
@@ -57,8 +62,8 @@ public class OrderService {
     }
 
 
-
-
+    //주문 내역
+    @Transactional(readOnly = true)
     public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
         Page<Order> orders = orderRepository.findByUserId(userId, pageable);
         if (orders.isEmpty()) {
@@ -90,15 +95,6 @@ public class OrderService {
                     .build();
         }).toList();
         return new PageImpl<>(result, pageable, orders.getTotalElements());
-
-
-
-
-
-
-
-
-
     }
 
 }

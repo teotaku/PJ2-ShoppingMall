@@ -33,6 +33,9 @@ public class Product {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column
+    private String color;
+
     @Builder.Default
     private int viewCount = 0; //조회수
     @Builder.Default
@@ -73,6 +76,7 @@ public class Product {
                 .imageUrl(this.imageUrl)
                 .viewCount(this.viewCount)
                 .purchaseCount(this.purchaseCount)
+                .color(color)
                 .popularityScore(this.getPopularityScore())
                 .build();
     }

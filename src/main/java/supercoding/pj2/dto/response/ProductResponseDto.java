@@ -16,10 +16,12 @@ public class ProductResponseDto {
     private BigDecimal price;
     private String description;
     public String imageUrl;
+    private String color;
     private int stock;
     private int viewCount;
     private int purchaseCount;
     private int popularityScore;
+
 
 
 }

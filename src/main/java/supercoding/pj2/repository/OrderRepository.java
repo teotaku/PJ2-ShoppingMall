@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import supercoding.pj2.entity.Order;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -14,4 +15,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Page<Order> findByUserId(Long userId, Pageable pageable);
 
+    Optional<Order> findTopByUserIdOrderByCreatedAtDesc(Long userId);
 }
