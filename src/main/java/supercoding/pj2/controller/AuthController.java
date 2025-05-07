@@ -8,10 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import supercoding.pj2.dto.request.LoginRequestDto;
 import supercoding.pj2.dto.request.SignupRequestDto;
+import supercoding.pj2.dto.request.VerificationRequestDto;
 import supercoding.pj2.dto.response.EmailCheckResponseDto;
 import supercoding.pj2.dto.response.LoginResponseDto;
 import supercoding.pj2.service.AuthService;
 import supercoding.pj2.service.UserService;
+import supercoding.pj2.service.VerificationService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,6 +22,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final VerificationService verificationService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequestDto request) {
@@ -43,5 +46,11 @@ public class AuthController {
     public ResponseEntity<EmailCheckResponseDto> checkEmail(@RequestParam String email) {
         boolean available = userService.isEmailAvailable(email);
         return ResponseEntity.ok(new EmailCheckResponseDto(available));
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<String> sendVerificationCode(@RequestBody VerificationRequestDto request) {
+        verificationService.sendCode(request);
+        return ResponseEntity.ok("Verification code sent.");
     }
 }
