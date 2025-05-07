@@ -82,7 +82,8 @@ public class User extends BaseEntity {
         }}
 
     public void chargeBalance(Long amount) {
-        this.balance += amount;
+        if(amount>0){
+        this.balance += amount;}
     }
 
     }
