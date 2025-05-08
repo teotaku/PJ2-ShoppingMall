@@ -76,7 +76,6 @@ public class Product {
                 .imageUrl(this.imageUrl)
                 .viewCount(this.viewCount)
                 .purchaseCount(this.purchaseCount)
-                .color(color)
                 .popularityScore(this.getPopularityScore())
                 .build();
     }
