@@ -1,19 +1,27 @@
 package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name= "seller_items")
+@Table(name = "seller_items")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SellerItem extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long sellerItemId;
 
-    @Column(name = "user_id")
+    @Column(nullable = false)
     private Long userId;
-    @Column(name = "product_id")
+
+    @Column(nullable = false)
     private Long productId;
 
+    @Column(nullable = false)
     private int stock;
-
 }
