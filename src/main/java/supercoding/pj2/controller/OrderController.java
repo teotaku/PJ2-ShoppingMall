@@ -1,5 +1,6 @@
 package supercoding.pj2.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,10 +20,11 @@ public class OrderController {
     private final OrderService orderService;
 
     //주문생성
+    @Operation(summary = "주문 생성",description = "파라미터로 주문dto 받고 주문 생성")
     @PostMapping
     public ResponseEntity<Void> createdOrder(@RequestParam Long userId,
-                                             @RequestBody OrderRequestDto orderRequest) {
-        orderService.createOrder(userId, orderRequest.getItems(), orderRequest.getShippingAddress());
+                                             @RequestBody OrderRequestDto orderRequestDto) {
+        orderService.createOrder(userId, orderRequestDto.getItems(), orderRequestDto.getShippingAddress());
         return ResponseEntity.ok().build();
 
     }
@@ -30,6 +32,7 @@ public class OrderController {
 
     //주문조회
     @GetMapping
+    @Operation(summary = "주문 조회",description = "파라미터로 pageable 받고 주문 조회")
     public ResponseEntity<Page<OrderResponseDto>> getOrders(
             @RequestParam Long userId,
             Pageable pageable) {

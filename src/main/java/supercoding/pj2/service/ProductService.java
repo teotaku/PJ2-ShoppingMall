@@ -35,6 +35,11 @@ public class ProductService {
     //키워드로 검색 페이징처리
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> findByKeyword(ProductSearchCondition condition) {
+        String keyword = condition.getKeyword();
+        if (keyword == null || keyword.isBlank()) {
+            throw new IllegalArgumentException("검색어를 입력하세요");
+        }
+
         Page<Product> result = productRepository
                 .findByNameContaining(condition.getKeyword(),condition.toPageable());
 
