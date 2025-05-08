@@ -111,8 +111,16 @@ public class CartService {
             product.decreaseStock(item.getQuantity()); //재고차감
         }
 
+        List<CartItemRequestDto> dtoItems = items.stream()
+                .map(item -> new CartItemRequestDto(
+                        item.getProductId(),
+                        item.getQuantity(),
+                        item.getPrice()
+                )).collect(Collectors.toList());
+
+
         //주문생성
-        orderService.createOrder(userId, items, shippingAddress);
+        orderService.createOrder(userId, dtoItems, shippingAddress);
 
 
         cartItemRepository.deleteAll(items); //결제후 장바구니 전부 비움.

@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import supercoding.pj2.dto.request.CartItemRequestDto;
 import supercoding.pj2.dto.response.OrderItemResponseDto;
 import supercoding.pj2.dto.response.OrderResponseDto;
 import supercoding.pj2.entity.*;
@@ -28,7 +29,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     //주문생성
-    public void createOrder(Long userId, List<CartItem> items ,String shippingAddress) {
+    public void createOrder(Long userId, List<CartItemRequestDto> items , String shippingAddress) {
         Order order = Order.builder()
                 .userId(userId)
                 .shippingAddress(shippingAddress)
@@ -38,7 +39,7 @@ public class OrderService {
         orderRepository.save(order);
 
         List<Long> productIds = items.stream()
-                .map(CartItem::getProductId)
+                .map(CartItemRequestDto::getProductId)
                 .distinct()
                 .toList();
 
@@ -64,37 +65,37 @@ public class OrderService {
 
     //주문 내역
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
-        Page<Order> orders = orderRepository.findByUserId(userId, pageable);
-        if (orders.isEmpty()) {
-            Page.empty(pageable);
-        }
-        //order id 주문 id 리스트 뽑기
-        List<Long> orderIds = orders.stream()
-                .map(Order::getId)
-                .toList();
-        //orderitem뽑기
-        List<OrderItem> orderItemList = orderItemRepository.findByOrderIdIn(orderIds);
-
-        //orderid 기준으로 orderitem 집어넣기.
-        Map<Long, List<OrderItem>> orderItemMap = orderItemList.stream()
-                .collect(Collectors.groupingBy(OrderItem::getOrderId));
-
-
-        //Order->OrderREsponseDTo 변환
-        List<OrderResponseDto> result = orders.stream().map(order -> {
-
-            List<OrderItemResponseDto> items = orderItemMap.getOrDefault(order.getId(), List.of()).stream()
-                    .map(OrderItem::toDto)
+        public Page<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
+            Page<Order> orders = orderRepository.findByUserId(userId, pageable);
+            if (orders.isEmpty()) {
+                Page.empty(pageable);
+            }
+            //order id 주문 id 리스트 뽑기
+            List<Long> orderIds = orders.stream()
+                    .map(Order::getId)
                     .toList();
+            //orderitem뽑기
+            List<OrderItem> orderItemList = orderItemRepository.findByOrderIdIn(orderIds);
 
-            return OrderResponseDto.builder()
-                    .orderId(order.getId())
-                    .shippingAddress(order.getShippingAddress())
-                    .items(items)
-                    .build();
-        }).toList();
-        return new PageImpl<>(result, pageable, orders.getTotalElements());
+            //orderid 기준으로 orderitem 집어넣기.
+            Map<Long, List<OrderItem>> orderItemMap = orderItemList.stream()
+                    .collect(Collectors.groupingBy(OrderItem::getOrderId));
+
+
+            //Order->OrderREsponseDTo 변환
+            List<OrderResponseDto> result = orders.stream().map(order -> {
+
+                List<OrderItemResponseDto> items = orderItemMap.getOrDefault(order.getId(), List.of()).stream()
+                        .map(OrderItem::toDto)
+                        .toList();
+
+                return OrderResponseDto.builder()
+                        .orderId(order.getId())
+                        .shippingAddress(order.getShippingAddress())
+                        .items(items)
+                        .build();
+            }).toList();
+            return new PageImpl<>(result, pageable, orders.getTotalElements());
     }
 
 }
