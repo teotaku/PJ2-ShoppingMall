@@ -6,14 +6,15 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 @Getter
-public class OrderItemResponseDto {
-    private String name;
+public class RecentOrderDto {
+
+    private String productName;
     private String imageUrl;
-    private BigDecimal price;
-    private int quantity;
     private String color;
+    private int quantity;
+    private BigDecimal price;
 
 }

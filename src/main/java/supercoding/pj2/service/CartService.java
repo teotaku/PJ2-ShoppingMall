@@ -2,6 +2,7 @@ package supercoding.pj2.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,9 @@ import supercoding.pj2.repository.OrderRepository;
 import supercoding.pj2.repository.ProductRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -35,7 +39,6 @@ public class CartService {
                                 .userId(userId)
                                 .build()));
 
-
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
 
@@ -49,21 +52,37 @@ public class CartService {
         cartItemRepository.save(item);
 
     }
-
+    @Transactional(readOnly = true)
     //장바구니 물품 전체 조회 페이징처리
     public Page<CartItemResponseDto> getCartItems(Long userId, Pageable pageable) {
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("장바구니가 없습니다"));
 
-        return cartItemRepository.findByCartId(cart.getId(), pageable)
-                .map(item -> CartItemResponseDto.builder()
-                        .id(item.getId())
-                        .productId(item.getProductId())
-                        .price(item.getPrice())
-                        .quantity(item.getQuantity())
-                        .price(item.getPrice())
-                        .build());
+        List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getCartId());
+
+        List<Long> productIds = cartItemList.stream()
+                .map(CartItem::getProductId)
+                .collect(Collectors.toList());
+
+        List<Product> products = productRepository.findAllById(productIds);
+
+        Map<Long, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        List<CartItemResponseDto> dtoList = cartItemList.stream()
+                .map(item -> {
+                    Product product = productMap.get(item.getProductId());
+                    return CartItemResponseDto.builder()
+                            .productId(product.getId())
+                            .name(product.getName())
+                            .color(product.getColor())
+                            .imageUrl(product.getImageUrl())
+                            .price(product.getPrice())
+                            .quantity(item.getQuantity())
+                            .build();
+                }).collect(Collectors.toList());
+        return new PageImpl<>(dtoList, pageable, cartItemList.size());
     }
     //장바구니 항목 수량 수정
     public void updateQuantity(Long itemId, int quantity) {

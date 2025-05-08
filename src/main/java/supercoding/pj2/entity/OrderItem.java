@@ -22,14 +22,15 @@ public class OrderItem extends BaseEntity{
     private Long orderId;
     @Column(name = "product_id")
     private Long productId;
-
+    @Column(nullable = false)
     private String name;
-
+    @Column
     private String imageUrl;
-
-
+    @Column
+    private String color;
+    @Column(nullable = false)
     private int quantity;
-
+    @Column(nullable = false)
     private BigDecimal price;
 
     public OrderItemResponseDto toDto() {
@@ -38,6 +39,7 @@ public class OrderItem extends BaseEntity{
                 .imageUrl(this.imageUrl)
                 .price(this.price)
                 .quantity(this.quantity)
+                .color(color)
                 .build();
     }
 

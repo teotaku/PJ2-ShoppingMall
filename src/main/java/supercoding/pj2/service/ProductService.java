@@ -56,7 +56,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> getByCategory(ProductSearchCondition condition) {
 
-
         Page<Product> result = productRepository
                 .findByCategoryId(condition.getCategoryId(), condition.toPageable());
         if (result.isEmpty()) {
