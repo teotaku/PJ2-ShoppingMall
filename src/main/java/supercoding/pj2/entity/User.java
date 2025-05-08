@@ -42,6 +42,10 @@ public class User extends BaseEntity {
     @Builder.Default
     private Provider provider = Provider.LOCAL;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+    
     @Column
     private String providerId;
 
