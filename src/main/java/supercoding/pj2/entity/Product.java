@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class Product {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long productId;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -68,7 +68,7 @@ public class Product {
 
     public ProductResponseDto toDto() {
         return ProductResponseDto.builder()
-                .id(this.id)
+                .id(this.productId)
                 .name(this.name)
                 .price(this.price)
                 .stock(this.stock)
