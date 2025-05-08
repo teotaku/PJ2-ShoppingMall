@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class Product {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -41,7 +41,9 @@ public class Product {
     @Builder.Default
     private int purchaseCount = 0; //구매수
 
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Provider provider;
 
     public int getPopularityScore() { //인기수 조회 << 조회수1 구매수5 비율로 설정.
         return this.viewCount + (purchaseCount * 5);
@@ -68,7 +70,7 @@ public class Product {
 
     public ProductResponseDto toDto() {
         return ProductResponseDto.builder()
-                .id(this.productId)
+                .id(this.id)
                 .name(this.name)
                 .price(this.price)
                 .stock(this.stock)
