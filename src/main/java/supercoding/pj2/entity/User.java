@@ -1,9 +1,8 @@
 package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 import supercoding.pj2.dto.request.UserRequestDto;
 import supercoding.pj2.dto.response.UserResponseDto;
 
@@ -12,6 +11,8 @@ import supercoding.pj2.dto.response.UserResponseDto;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends BaseEntity {
 
     @Id
@@ -38,12 +39,14 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Provider provider = Provider.LOCAL;
 
     @Column
     private String providerId;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isDeleted = false;
 
     @Column
