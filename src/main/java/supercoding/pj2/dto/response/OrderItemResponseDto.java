@@ -11,10 +11,8 @@ import java.math.BigDecimal;
 @Builder
 @Getter
 public class OrderItemResponseDto {
-
     private String name;
     private String imageUrl;
     private BigDecimal price;
     private int quantity;
-
 }

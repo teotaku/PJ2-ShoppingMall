@@ -11,6 +11,7 @@ import supercoding.pj2.dto.request.SignupRequestDto;
 import supercoding.pj2.dto.request.VerificationRequestDto;
 import supercoding.pj2.dto.response.EmailCheckResponseDto;
 import supercoding.pj2.dto.response.LoginResponseDto;
+import supercoding.pj2.dto.response.OAuthResponseDto;
 import supercoding.pj2.service.AuthService;
 import supercoding.pj2.service.UserService;
 import supercoding.pj2.service.VerificationService;
@@ -52,5 +53,14 @@ public class AuthController {
     public ResponseEntity<String> sendVerificationCode(@RequestBody VerificationRequestDto request) {
         verificationService.sendCode(request);
         return ResponseEntity.ok("Verification code sent.");
+    }
+
+    @GetMapping("/{provider}")
+    public ResponseEntity<OAuthResponseDto> oauthLogin(
+            @PathVariable String provider,
+            @RequestParam("code") String code
+    ) {
+        OAuthResponseDto response = authService.login(provider, code);
+        return ResponseEntity.ok(response);
     }
 }

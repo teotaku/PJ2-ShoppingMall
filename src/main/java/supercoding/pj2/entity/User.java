@@ -1,15 +1,15 @@
 package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends BaseEntity {
 
     @Id
@@ -36,19 +36,22 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Provider provider = Provider.LOCAL;
 
     @Column
     private String providerId;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isDeleted = false;
 
     public enum Gender {
         M, F
     }
 
-    public enum Provider {
-        LOCAL, GOOGLE, KAKAO, NAVER
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER; // 기본값 USER
+
 }

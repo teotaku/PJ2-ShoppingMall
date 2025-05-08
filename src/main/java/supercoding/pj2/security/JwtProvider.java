@@ -27,4 +27,17 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
                 .compact();
     }
+
+    public String createToken(String email, String role) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + 1000 * 60 * 60 * 24); // 1일
+
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
+                .compact();
+    }
 }
