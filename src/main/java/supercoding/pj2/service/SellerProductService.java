@@ -3,11 +3,15 @@ package supercoding.pj2.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import supercoding.pj2.dto.request.SellerProductRequestDto;
+import supercoding.pj2.dto.response.SellerProductListResponseDto;
 import supercoding.pj2.dto.response.SellerProductResponseDto;
 import supercoding.pj2.entity.Product;
 import supercoding.pj2.entity.SellerItem;
 import supercoding.pj2.repository.ProductRepository;
 import supercoding.pj2.repository.SellerItemRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,4 +37,20 @@ public class SellerProductService {
                 .sellerItemId(sellerItem.getSellerItemId())
                 .build();
     }
+
+    public List<SellerProductListResponseDto> getSellerProducts(Long userId) {
+        List<SellerItem> items = sellerItemRepository.findByUserId(userId);
+
+        return items.stream().map(item -> {
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
+            return new SellerProductListResponseDto(
+                    product.getProductId(),
+                    product.getName(),
+                    product.getPrice().intValue(),  // BigDecimal → int
+                    item.getStock()
+            );
+        }).collect(Collectors.toList());
+    }
+
 }

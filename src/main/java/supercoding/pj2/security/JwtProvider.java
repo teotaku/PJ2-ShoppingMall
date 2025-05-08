@@ -1,5 +1,6 @@
 package supercoding.pj2.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Value;
@@ -39,5 +40,14 @@ public class JwtProvider {
                 .setExpiration(expiry)
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes(StandardCharsets.UTF_8))
                 .compact();
+    }
+
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token.replace("Bearer ", ""))
+                .getBody();
+
+        return Long.parseLong(claims.getSubject()); // subject는 userId로 저장해둠
     }
 }
