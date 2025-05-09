@@ -26,7 +26,7 @@ public class SellerProductService {
 
         SellerItem sellerItem = SellerItem.builder()
                 .userId(request.getUserId())
-                .productId(product.getProductId())
+                .productId(product.getId())
                 .stock(request.getStock())
                 .build();
 
@@ -45,7 +45,7 @@ public class SellerProductService {
             Product product = productRepository.findById(item.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
             return new SellerProductListResponseDto(
-                    product.getProductId(),
+                    product.getId(),
                     product.getName(),
                     product.getPrice().intValue(),  // BigDecimal → int
                     item.getStock()
