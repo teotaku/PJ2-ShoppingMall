@@ -14,7 +14,7 @@ import supercoding.pj2.dto.response.ProductResponseDto;
 import supercoding.pj2.service.ProductService;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -43,7 +43,7 @@ public class ProductController {
     }
 
     //아이디로 단건 조회
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     @Operation(summary = "상품 단건 조회",description = "파라미터로 상품id 받고 상품 단건 조회")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
