@@ -32,7 +32,7 @@ public class KaKaoUserInfo extends OAuthUserInfo {
         return User.builder()
                 .email(getEmail())
                 .name(getName())
-                .provider(Provider.KAKAO)
+                .provider(User.Provider.KAKAO)
                 .providerId(getProvider())
                 .password("") // 소셜 로그인 사용자는 비번 없음
                 .isDeleted(false)

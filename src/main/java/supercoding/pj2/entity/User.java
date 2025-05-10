@@ -1,7 +1,6 @@
 package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
-
 import lombok.*;
 import supercoding.pj2.dto.request.UserRequestDto;
 import supercoding.pj2.dto.response.UserResponseDto;
@@ -44,8 +43,9 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Role role = Role.USER;
-    
+
     @Column
     private String providerId;
 
@@ -60,7 +60,7 @@ public class User extends BaseEntity {
     private Long balance;
 
     public enum Gender {
-        M, F,
+        M, F
     }
 
     public enum Provider {
@@ -75,22 +75,13 @@ public class User extends BaseEntity {
     }
 
     public void update(UserRequestDto dto) {
-        if (dto.getEmail() != null) {
-            this.email = dto.getEmail();
-        }
-        if (dto.getPhoneNumber() != null) {
-            this.phone = dto.getPhoneNumber();
-        }
-        if (dto.getShippingAddress() != null) {
-            this.address = dto.getShippingAddress();
-        }
-        if (dto.getProfileImageUrl() != null) {
-            this.profileImageUrl = dto.getProfileImageUrl();
-        }}
+        if (dto.getEmail() != null) this.email = dto.getEmail();
+        if (dto.getPhoneNumber() != null) this.phone = dto.getPhoneNumber();
+        if (dto.getShippingAddress() != null) this.address = dto.getShippingAddress();
+        if (dto.getProfileImageUrl() != null) this.profileImageUrl = dto.getProfileImageUrl();
+    }
 
     public void chargeBalance(Long amount) {
-        if(amount>0){
-        this.balance += amount;}
+        if (amount > 0) this.balance += amount;
     }
-
-    }
+}

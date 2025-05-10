@@ -32,7 +32,7 @@ public class NaverUserInfo extends OAuthUserInfo {
         return User.builder()
                 .email(getEmail())
                 .name(getName())
-                .provider(Provider.NAVER)
+                .provider(User.Provider.NAVER)
                 .providerId(getProvider())
                 .password("") // 소셜 로그인 사용자는 비번 없음
                 .isDeleted(false)
