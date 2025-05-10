@@ -23,7 +23,11 @@ public class CategoryService {
     }
 
     public void create(String name) {
-
+        if (categoryRepository.existsByName(name)) {
+            throw new IllegalArgumentException("이미 존재하는 카테고리입니다.");
+        }
+        Category category = Category.create(name);
+        categoryRepository.save(category);
 
     }
 }
