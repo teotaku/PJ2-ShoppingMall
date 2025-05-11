@@ -10,6 +10,8 @@ import supercoding.pj2.dto.request.ProductRequestDto;
 import supercoding.pj2.dto.request.ProductSearchCondition;
 import supercoding.pj2.dto.response.ProductResponseDto;
 import supercoding.pj2.entity.Product;
+import supercoding.pj2.exception.InvalidSearchConditionException;
+import supercoding.pj2.exception.NotFoundException;
 import supercoding.pj2.repository.CategoryRepository;
 import supercoding.pj2.repository.ProductRepository;
 
@@ -37,14 +39,14 @@ public class ProductService {
     public Page<ProductResponseDto> findByKeyword(ProductSearchCondition condition) {
         String keyword = condition.getKeyword();
         if (keyword == null || keyword.isBlank()) {
-            throw new IllegalArgumentException("검색어를 입력하세요");
+            throw new InvalidSearchConditionException();
         }
 
         Page<Product> result = productRepository
                 .findByNameContaining(condition.getKeyword(),condition.toPageable());
 
         if (result.isEmpty()) {
-            throw new IllegalArgumentException("검색 결과가 없습니다.");
+            throw new NotFoundException("검색 결과가 없습니다.");
         }
         return result.map(Product::toDto);
     }
@@ -53,7 +55,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductResponseDto getProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수가 없습니다."));
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
         return product.toDto();
     }
 
@@ -64,7 +66,7 @@ public class ProductService {
         Page<Product> result = productRepository
                 .findByCategoryId(condition.getCategoryId(), condition.toPageable());
         if (result.isEmpty()) {
-            throw new IllegalArgumentException("해당 카테고리 상품이 없습니다.");
+            throw new NotFoundException("해당 카테고리 상품이 없습니다.");
         }
         return result.map(Product::toDto);
     }
@@ -77,7 +79,7 @@ public class ProductService {
     //상품 수정
     public void updateProduct(Long id, ProductRequestDto dto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("상품이 존재하지 않습니다."));
         product.update(dto);
     }
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import supercoding.pj2.dto.response.CategoryDto;
 import supercoding.pj2.entity.Category;
+import supercoding.pj2.exception.DuplicateCategoryException;
 import supercoding.pj2.repository.CategoryRepository;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class CategoryService {
 
     public void create(String name) {
         if (categoryRepository.existsByName(name)) {
-            throw new IllegalArgumentException("이미 존재하는 카테고리입니다.");
+            throw new DuplicateCategoryException();
         }
         Category category = Category.create(name);
         categoryRepository.save(category);

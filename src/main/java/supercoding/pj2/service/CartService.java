@@ -11,6 +11,8 @@ import supercoding.pj2.dto.response.CartItemResponseDto;
 import supercoding.pj2.entity.Cart;
 import supercoding.pj2.entity.CartItem;
 import supercoding.pj2.entity.Product;
+import supercoding.pj2.exception.NotFoundException;
+import supercoding.pj2.exception.OutOfStockException;
 import supercoding.pj2.repository.CartItemRepository;
 import supercoding.pj2.repository.CartRepository;
 import supercoding.pj2.repository.OrderRepository;
@@ -40,7 +42,7 @@ public class CartService {
                                 .build()));
 
         Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("상품이 존재하지 않습니다."));
 
 
         CartItem item = CartItem.builder()
@@ -57,7 +59,7 @@ public class CartService {
     public Page<CartItemResponseDto> getCartItems(Long userId, Pageable pageable) {
 
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("장바구니가 없습니다"));
+                .orElseThrow(() -> new NotFoundException("장바구니가 없습니다."));
 
         List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getCartId());
 
@@ -87,7 +89,7 @@ public class CartService {
     //장바구니 항목 수량 수정
     public void updateQuantity(Long itemId, int quantity) {
         CartItem item = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("장바구니 항목이 없습니다."));
+                .orElseThrow(() -> new NotFoundException("장바구니 항목이 없습니다."));
         item.updateQuantity(quantity);
     }
     //장바구니 항목 삭제
@@ -98,15 +100,15 @@ public class CartService {
     //장바구니 결제 처리: 재고 감소 + 장바구니 비움
     public void checkout(Long userId,String shippingAddress) {
         Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("장바구니가 없습니다."));
+                .orElseThrow(() -> new NotFoundException("장바구니가 없습니다."));
 
         List<CartItem> items = cartItemRepository.findByCartId(cart.getId());
 
         for (CartItem item : items) {
             Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new NotFoundException("상품이 존재하지 않습니다."));
             if (product.getStock() < item.getQuantity()) {
-                throw new RuntimeException("상품 재고가 부족합니다." + product.getName());
+                throw new OutOfStockException(product.getName());
             }
             product.decreaseStock(item.getQuantity()); //재고차감
         }

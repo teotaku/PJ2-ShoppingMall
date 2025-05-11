@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import supercoding.pj2.entity.User;
+import supercoding.pj2.exception.NotFoundException;
 import supercoding.pj2.repository.UserRepository;
 
 @Service
@@ -25,6 +26,6 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(()->new NotFoundException("유저를 찾을 수 없습니다."));
     }
 }

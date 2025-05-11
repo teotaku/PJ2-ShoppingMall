@@ -33,6 +33,9 @@ public class Product {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column(name = "size")
+    private String size; // 사이즈 추가
+
     @Column
     private String color;
 

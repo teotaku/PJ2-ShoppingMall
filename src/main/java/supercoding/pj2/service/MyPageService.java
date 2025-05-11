@@ -10,6 +10,7 @@ import supercoding.pj2.dto.response.UserResponseDto;
 import supercoding.pj2.entity.Order;
 import supercoding.pj2.entity.OrderItem;
 import supercoding.pj2.entity.User;
+import supercoding.pj2.exception.NotFoundException;
 import supercoding.pj2.repository.OrderItemRepository;
 import supercoding.pj2.repository.OrderRepository;
 import supercoding.pj2.repository.ProductRepository;
@@ -31,7 +32,7 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public UserResponseDto getMyInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
 
         //가장 최근 주문 1건 조회
         Order recentOrder = orderRepository.findTopByUserIdOrderByCreatedAtDesc(userId).orElse(null);
@@ -63,7 +64,7 @@ public class MyPageService {
     @Transactional
     public void updateMyInfo(Long userId, UserRequestDto dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다."));
         user.update(dto);
     }
 
@@ -71,7 +72,7 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public Long getPayBalance(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다"));
         return user.getBalance();
     }
 
@@ -79,7 +80,7 @@ public class MyPageService {
     @Transactional
     public void chargePay(Long userId, Long amount) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다"));
+                .orElseThrow(() -> new NotFoundException("유저를 찾을 수 없습니다"));
             user.chargeBalance(amount);
     }
 
