@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Schema(hidden = true)
 @AllArgsConstructor
 @Getter
 public class ErrorResponse {

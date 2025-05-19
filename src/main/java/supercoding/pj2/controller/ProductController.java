@@ -6,12 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import supercoding.pj2.dto.request.ProductRequestDto;
 import supercoding.pj2.dto.request.ProductSearchCondition;
 import supercoding.pj2.dto.response.ProductResponseDto;
+import supercoding.pj2.s3.S3Uploader;
 import supercoding.pj2.service.ProductService;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -19,6 +24,7 @@ import supercoding.pj2.service.ProductService;
 public class ProductController {
 
     private final ProductService productService;
+    private final S3Uploader s3Uploader;
 
     //전체상품조회
     @GetMapping
@@ -50,9 +56,15 @@ public class ProductController {
     }
 
     //상품 등록
-    @PostMapping
-    @Operation(summary = "상품 등록",description = "파라미터로 상품DTO 받고 상품 등록")
-    public ResponseEntity<Void> create(@RequestBody ProductRequestDto dto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "상품 등록",description = "이미지와 상품 정보를 함께 받아 상품을 등록합니다.")
+    public ResponseEntity<Void> create(@RequestPart("dto") ProductRequestDto dto,
+                                       @RequestPart("image")MultipartFile image) throws IOException {
+
+        String imageUrl = s3Uploader.upload(image);
+
+        dto.injectImageUrl(imageUrl);
+
         productService.createProduct(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

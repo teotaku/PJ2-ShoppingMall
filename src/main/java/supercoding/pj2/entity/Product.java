@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+public class Product extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,7 +46,8 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Provider provider;
+    @Builder.Default
+    private Provider provider = Provider.LOCAL;
 
     public int getPopularityScore() { //인기수 조회 << 조회수1 구매수5 비율로 설정.
         return this.viewCount + (purchaseCount * 5);

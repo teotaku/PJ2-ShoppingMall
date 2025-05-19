@@ -1,9 +1,7 @@
 package supercoding.pj2.service;
 
-import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import supercoding.pj2.dto.request.ProductRequestDto;
@@ -18,13 +16,13 @@ import supercoding.pj2.repository.ProductRepository;
 import java.util.Comparator;
 import java.util.List;
 
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProductService {
 
-    private ProductRepository productRepository;
-    private CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
 
     //전체상품목록 조회(페이징 포함) 클라이언트에서 받은 검색조건 포함하여 상품 목록을 page형태로 반환.
@@ -34,6 +32,7 @@ public class ProductService {
                 .map(Product::toDto);
 
     }
+
     //키워드로 검색 페이징처리
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> findByKeyword(ProductSearchCondition condition) {
@@ -43,7 +42,7 @@ public class ProductService {
         }
 
         Page<Product> result = productRepository
-                .findByNameContaining(condition.getKeyword(),condition.toPageable());
+                .findByNameContaining(condition.getKeyword(), condition.toPageable());
 
         if (result.isEmpty()) {
             throw new NotFoundException("검색 결과가 없습니다.");
@@ -70,6 +69,7 @@ public class ProductService {
         }
         return result.map(Product::toDto);
     }
+
     //상품 등록
     public void createProduct(ProductRequestDto dto) {
         Product product = dto.toEntity();
@@ -89,27 +89,35 @@ public class ProductService {
         Pageable pageable = condition.toPageable();
 
         switch (condition.getSortBy()) {
-            case "views" :
+            case "views":
                 return productRepository.findAllByOrderByViewCountDesc(pageable)
                         .map(Product::toDto);
-            case "purchases" :
+
+            case "purchases":
                 return productRepository.findAllByOrderByPurchaseCountDesc(pageable)
                         .map(Product::toDto);
 
-            case "popularity":
-            default:
-                Page<Product> page = productRepository.findAll(pageable);
+            case "createdAt":
+                return productRepository.findAll(
+                        PageRequest.of(
+                                condition.getPage(),
+                                condition.getSize(),
+                                Sort.by(Sort.Direction.fromString(condition.getDirection().toUpperCase().trim()), "createdAt")
+                        )
+                ).map(Product::toDto);
 
+            case "popularity": {
+                Page<Product> page = productRepository.findAll(pageable);
                 List<Product> sorted = page.getContent().stream()
                         .sorted(Comparator.comparing(Product::getPopularityScore).reversed())
                         .toList();
 
                 return new PageImpl<>(sorted, pageable, page.getTotalElements())
                         .map(Product::toDto);
+            }
+
+            default:
+                throw new IllegalArgumentException("지원하지 않는 정렬 조건: " + condition.getSortBy());
         }
-
     }
-
-
-
 }

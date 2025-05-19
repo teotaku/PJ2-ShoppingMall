@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class ProductRequestDto {
-    @Schema(description = "상품 ID", example = "1")
-    private Long id;
+
     @Schema(description = "상품 이름", example = "무선 키보드")
     private String name;
     @Schema(description = "상품 가격", example = "24900.00")
@@ -39,5 +38,8 @@ public class ProductRequestDto {
                 .color(color)
                 .build();
 
+    }
+    public void injectImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
