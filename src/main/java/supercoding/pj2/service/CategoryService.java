@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import supercoding.pj2.dto.response.CategoryDto;
 import supercoding.pj2.entity.Category;
 import supercoding.pj2.exception.DuplicateCategoryException;
+import supercoding.pj2.exception.NotFoundException;
 import supercoding.pj2.repository.CategoryRepository;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
 
     public List<CategoryDto> getAll() {
@@ -31,4 +32,12 @@ public class CategoryService {
         categoryRepository.save(category);
 
     }
-}
+
+    public void delete(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("카테고리를 찾을 수 없습니다."));
+        categoryRepository.delete(category);
+
+    }
+
+    }
