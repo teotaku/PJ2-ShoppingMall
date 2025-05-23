@@ -33,4 +33,14 @@ public class VerificationCode extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean verified = false;
+
+    public static VerificationCode create(String destination, String code, VerificationType type) {
+        return VerificationCode.builder()
+                .type(type)
+                .destination(destination)
+                .code(code)
+                .expiresAt(LocalDateTime.now().plusMinutes(3))
+                .build();
+    }
+
 }

@@ -2,6 +2,8 @@ package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import supercoding.pj2.dto.request.SignupRequestDto;
 import supercoding.pj2.dto.request.UserRequestDto;
 import supercoding.pj2.dto.response.UserResponseDto;
 
@@ -74,11 +76,29 @@ public class User extends BaseEntity {
                 .build();
     }
 
+    public static User create(SignupRequestDto dto, PasswordEncoder encoder) {
+        return User.builder()
+                .email(dto.getEmail())
+                .password(encoder.encode(dto.getPassword()))
+                .name(dto.getName())
+                .phone(dto.getPhone())
+                .address(dto.getAddress())
+                .gender(Gender.valueOf(dto.getGender()))
+                .provider(Provider.LOCAL)
+                .role(Role.USER)
+                .isDeleted(false)
+                .build();
+    }
+
     public void update(UserRequestDto dto) {
         if (dto.getEmail() != null) this.email = dto.getEmail();
         if (dto.getPhoneNumber() != null) this.phone = dto.getPhoneNumber();
         if (dto.getShippingAddress() != null) this.address = dto.getShippingAddress();
         if (dto.getProfileImageUrl() != null) this.profileImageUrl = dto.getProfileImageUrl();
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
     }
 
     public void chargeBalance(Long amount) {
