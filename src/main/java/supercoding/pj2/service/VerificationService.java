@@ -31,13 +31,7 @@ public class VerificationService {
         String code = String.valueOf((int) (Math.random() * 900000 + 100000));  // 6자리 숫자
 
         // 3. 인증코드 객체 저장
-        VerificationCode verification = VerificationCode.builder()
-                .type(type)
-                .destination(destination)
-                .code(code)
-                .expiresAt(LocalDateTime.now().plusMinutes(3))  // 유효기간 3분
-                .build();
-
+        VerificationCode verification = VerificationCode.create(destination, code, type);
         verificationCodeRepository.save(verification);
 
         // 4. 인증 수단에 따라 전송

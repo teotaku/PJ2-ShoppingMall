@@ -24,12 +24,7 @@ public class SellerProductService {
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
 
-        SellerItem sellerItem = SellerItem.builder()
-                .userId(request.getUserId())
-                .productId(product.getId())
-                .stock(request.getStock())
-                .build();
-
+        SellerItem sellerItem = SellerItem.createFrom(request);
         sellerItemRepository.save(sellerItem);
 
         return SellerProductResponseDto.builder()

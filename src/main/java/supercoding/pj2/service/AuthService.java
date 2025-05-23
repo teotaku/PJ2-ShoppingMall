@@ -32,12 +32,7 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
-
-        User user = request.toEntity();
-
-        // 평문 비밀번호를 암호화해서 덮어씀
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        User user = User.create(request, passwordEncoder);
         userRepository.save(user);
     }
 

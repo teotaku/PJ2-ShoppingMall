@@ -16,9 +16,10 @@ public class UserService {
     public void softDelete(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        user.setDeleted(true);
+        user.markAsDeleted();
         userRepository.save(user);
     }
+
 
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
