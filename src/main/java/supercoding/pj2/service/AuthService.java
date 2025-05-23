@@ -33,15 +33,14 @@ public class AuthService {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
-        User user = new User();
-        user.setEmail(request.getEmail());
+        User user = request.toEntity();
+
+        // 평문 비밀번호를 암호화해서 덮어씀
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setName(request.getName());
-        user.setPhone(request.getPhone());
-        user.setAddress(request.getAddress());
-        user.setGender(User.Gender.valueOf(request.getGender()));
+
         userRepository.save(user);
     }
+
 
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.getEmail())
