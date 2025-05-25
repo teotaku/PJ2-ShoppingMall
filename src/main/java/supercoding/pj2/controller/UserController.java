@@ -1,5 +1,6 @@
 package supercoding.pj2.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "회원 탈퇴 (소프트 삭제)", description = "현재 로그인한 사용자의 계정을 소프트 삭제합니다.")
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMe(@AuthenticationPrincipal UserDetails userDetails) {
         userService.softDelete(userDetails.getUsername());

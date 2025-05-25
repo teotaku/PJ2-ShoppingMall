@@ -2,6 +2,7 @@ package supercoding.pj2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import supercoding.pj2.dto.request.SellerProductRequestDto;
 
 @Entity
 @Table(name = "seller_items")
@@ -24,4 +25,13 @@ public class SellerItem extends BaseEntity {
 
     @Column(nullable = false)
     private int stock;
+
+    public static SellerItem createFrom(SellerProductRequestDto dto) {
+        return SellerItem.builder()
+                .userId(dto.getUserId())
+                .productId(dto.getProductId())
+                .stock(dto.getStock())
+                .build();
+    }
+
 }

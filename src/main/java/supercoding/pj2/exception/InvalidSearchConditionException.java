@@ -1,8 +1,9 @@
-// InvalidSearchConditionException.java
 package supercoding.pj2.exception;
 
-public class InvalidSearchConditionException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class InvalidSearchConditionException extends CustomException {
     public InvalidSearchConditionException() {
-        super("검색어를 입력하세요.");
+        super("검색어를 입력하세요.", HttpStatus.BAD_REQUEST);
     }
 }

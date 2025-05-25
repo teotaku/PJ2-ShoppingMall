@@ -48,7 +48,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .cors(withDefaults()) // 🔥 이거 꼭 필요함!
+
                 .authorizeHttpRequests(auth -> auth
 
                         //  Swagger 허용
