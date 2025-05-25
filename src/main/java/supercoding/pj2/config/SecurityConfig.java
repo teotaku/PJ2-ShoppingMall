@@ -1,7 +1,9 @@
 package supercoding.pj2.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -9,10 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -23,53 +27,56 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-
-    // CORS 설정 추가
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    //  강제 적용되는 CORS 필터 등록 (보안 필터보다 먼저 실행됨)
+    @Bean(name = "corsFilterCustom")
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // 모든 Origin 허용
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // 필요 시 세션/쿠키 전송 허용
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return source;
+
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(0); // 가장 먼저 적용되도록
+        return bean;
     }
-
-
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/auth/signup",
-                                "/api/v1/auth/login",
-                                "/api/v1/auth/check-email",
-                                "/api/v1/auth/verify-code",
-                                "/api/v1/oauth/authorization/**",
 
-                                "/api/**",  // ← Swagger 테스트용으로 전체 API 열기 (임시)
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/api-docs",
-                                "/api-docs/**"
+                .cors(withDefaults()) // 🔥 이거 꼭 필요함!
+
+                .authorizeHttpRequests(auth -> auth
+
+                        //  Swagger 허용
+                        .requestMatchers(
+                                "/swagger-ui.html", "/swagger-ui/**",
+                                "/v3/api-docs", "/v3/api-docs/**",
+                                "/api-docs", "/api-docs/**"
                         ).permitAll()
+
+                        //  인증 없이 접근 가능한 API
+                                .requestMatchers("/api/**").permitAll()
+
+                        // multipart POST 명시적으로 허용
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products").permitAll()
+
+                        //  정적 리소스 허용
+                        .requestMatchers(
+                                "/", "/index.html", "/favicon.ico",
+                                "/static/**", "/assets/**", "/css/**", "/js/**", "/images/**"
+                        ).permitAll()
+                        //  프리플라이트 OPTIONS 요청 허용
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        //  그 외는 인증 필요
                         .anyRequest().authenticated()
                 );
 
-
-
         return http.build();
     }
-
 }

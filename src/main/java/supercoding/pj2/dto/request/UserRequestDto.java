@@ -19,7 +19,9 @@ public class UserRequestDto {
     @Schema(description = "전화번호", example = "010-1234-5678")
     private String phoneNumber;
 
-
+    public void setProfileImageUrl(String imageUrl) {
+        this.profileImageUrl = imageUrl;
+    }
 
 
 }

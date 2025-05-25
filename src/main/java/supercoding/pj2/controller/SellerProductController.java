@@ -11,7 +11,7 @@ import supercoding.pj2.security.JwtProvider;
 import supercoding.pj2.service.SellerProductService;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/seller/products")
 @RequiredArgsConstructor

@@ -11,12 +11,10 @@ import supercoding.pj2.dto.response.CartItemResponseDto;
 import supercoding.pj2.entity.Cart;
 import supercoding.pj2.entity.CartItem;
 import supercoding.pj2.entity.Product;
+import supercoding.pj2.entity.ProductSize;
 import supercoding.pj2.exception.NotFoundException;
 import supercoding.pj2.exception.OutOfStockException;
-import supercoding.pj2.repository.CartItemRepository;
-import supercoding.pj2.repository.CartRepository;
-import supercoding.pj2.repository.OrderRepository;
-import supercoding.pj2.repository.ProductRepository;
+import supercoding.pj2.repository.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +30,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final OrderService orderService;
     private final CartRepository cartRepository;
+    private final ProductSizeRepository productSizeRepository;
 
     //장바구니에 상품 추가
     public void addItem(Long userId, CartItemRequestDto dto) {
@@ -82,6 +81,7 @@ public class CartService {
                             .imageUrl(product.getImageUrl())
                             .price(product.getPrice())
                             .quantity(item.getQuantity())
+                            .size(item.getSize())
                             .build();
                 }).collect(Collectors.toList());
         return new PageImpl<>(dtoList, pageable, cartItemList.size());
@@ -99,35 +99,41 @@ public class CartService {
 
     //장바구니 결제 처리: 재고 감소 + 장바구니 비움
     public void checkout(Long userId,String shippingAddress) {
+        //사용자 장바구니 조회
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("장바구니가 없습니다."));
-
+        //1 장바구니에 담긴 모든 항목 조회
         List<CartItem> items = cartItemRepository.findByCartId(cart.getId());
-
+        //1-1각 장바구니 항목에 대해 사이즈별 재고 차감 처리
         for (CartItem item : items) {
-            Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new NotFoundException("상품이 존재하지 않습니다."));
-            if (product.getStock() < item.getQuantity()) {
-                throw new OutOfStockException(product.getName());
+            ProductSize productSize = productSizeRepository.findByProductIdAndSize(item.getProductId(), item.getSize())
+                    .orElseThrow(() -> new NotFoundException("해당 사이즈의 상품이 존재하지 않습니다."));
+
+            //1-2재고가 부족한 경우 예외 발생
+            if (productSize.getStock() < item.getQuantity()) {
+                throw new OutOfStockException("재고 부족 : 상품 ID " + item.getProductId() + ", 사이즈 " + item.getSize());
             }
-            product.decreaseStock(item.getQuantity()); //재고차감
-        }
+            //1-3재고 차감
+            productSize.decreaseStock(item.getQuantity());
+            }
+            //주문 요청 dto로변환
+        List<CartItemRequestDto> dtoItems = items.stream().map(item -> new CartItemRequestDto(
+                item.getProductId(),
+                item.getQuantity(),
+                item.getPrice(),
+                item.getSize()
+        )).collect(Collectors.toList());
 
-        List<CartItemRequestDto> dtoItems = items.stream()
-                .map(item -> new CartItemRequestDto(
-                        item.getProductId(),
-                        item.getQuantity(),
-                        item.getPrice()
-                )).collect(Collectors.toList());
-
-
-        //주문생성
-        orderService.createOrder(userId, dtoItems, shippingAddress);
-
-
-        cartItemRepository.deleteAll(items); //결제후 장바구니 전부 비움.
+        // 주문생성
+        orderService.createOrder(userId,dtoItems,shippingAddress);
+        //결제 완료 후 장바구니 비움
+        cartItemRepository.deleteAll(items);
     }
 
 
-}
+
+
+    }
+
+
 

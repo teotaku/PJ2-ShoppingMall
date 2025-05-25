@@ -18,6 +18,7 @@ public class CartItemResponseDto {
     private int quantity;
     private String color;
     private String imageUrl;
+    private String size;
 
 
 }

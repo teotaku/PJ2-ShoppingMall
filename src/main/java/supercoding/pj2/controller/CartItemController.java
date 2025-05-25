@@ -13,7 +13,7 @@ import supercoding.pj2.dto.response.CartItemResponseDto;
 import supercoding.pj2.entity.User;
 import supercoding.pj2.service.CartService;
 import supercoding.pj2.service.UserService;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor

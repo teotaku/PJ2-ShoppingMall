@@ -10,7 +10,7 @@ import supercoding.pj2.dto.response.CategoryDto;
 import supercoding.pj2.service.CategoryService;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/categories")

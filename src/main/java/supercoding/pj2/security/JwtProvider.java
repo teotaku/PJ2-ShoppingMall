@@ -3,17 +3,23 @@ package supercoding.pj2.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Component
 public class JwtProvider {
 
-//    @Value("${jwt.secret}")
-    private String secret;
+    private final String secret;
+
+    public JwtProvider() {
+        this.secret = System.getenv("JWT_SECRET");
+    }
 
     public String generateToken(Long userId, String email, String provider) {
         Date now = new Date();

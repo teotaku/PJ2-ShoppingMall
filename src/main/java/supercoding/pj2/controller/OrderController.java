@@ -14,7 +14,7 @@ import supercoding.pj2.dto.response.OrderItemResponseDto;
 import supercoding.pj2.dto.response.OrderResponseDto;
 import supercoding.pj2.service.OrderService;
 import supercoding.pj2.service.UserService;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
@@ -23,16 +23,16 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
 
-    //주문생성
-    @Operation(summary = "주문 생성",description = "파라미터로 주문dto 받고 주문 생성")
-    @PostMapping
-    public ResponseEntity<Void> createdOrder(@AuthenticationPrincipal UserDetails userDetails,
-                                             @RequestBody OrderRequestDto orderRequestDto) {
-        Long userId = userService.findByEmail(userDetails.getUsername()).getId();
-        orderService.createOrder(userId, orderRequestDto.getItems(), orderRequestDto.getShippingAddress());
-        return ResponseEntity.ok().build();
-
-    }
+//    //주문생성
+//    @Operation(summary = "주문 생성",description = "파라미터로 주문dto 받고 주문 생성")
+//    @PostMapping
+//    public ResponseEntity<Void> createdOrder(@AuthenticationPrincipal UserDetails userDetails,
+//                                             @RequestBody OrderRequestDto orderRequestDto) {
+//        Long userId = userService.findByEmail(userDetails.getUsername()).getId();
+//        orderService.createOrder(userId, orderRequestDto.getItems(), orderRequestDto.getShippingAddress());
+//        return ResponseEntity.ok().build();
+//
+//    }
 
 
     //주문조회
