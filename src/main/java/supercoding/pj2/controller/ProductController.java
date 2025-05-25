@@ -101,7 +101,19 @@ public class ProductController {
 
     //인기순,조회수,구매수 상품 조회(기본값 인기수)
     @GetMapping("/sorted")
-    @Operation(summary = "상품 인기수,조회수,구매수 정렬", description = "파라미터로 pageable(정렬조건) 받고 주문 조회")
+    @Operation(
+            summary = "상품 정렬 조회",
+            description = """
+    상품을 다양한 기준(createdAt, views, purchases, popularity)으로 정렬하여 조회합니다.
+    
+    - createdAt: 등록일 기준 최신순 정렬 (기본값)
+    - views: 조회수 많은 순
+    - purchases: 구매수 많은 순
+    - popularity: 인기 점수(PopularityScore) 기준 정렬 (내림차순)
+    
+    페이징 및 정렬 방향(desc/asc)은 파라미터로 지정 가능합니다.
+    """
+    )
     public ResponseEntity<Page<ProductResponseDto>> sorted(@ParameterObject ProductSearchCondition condition) {
 
         return ResponseEntity.ok(productService.getSortedProducts(condition));

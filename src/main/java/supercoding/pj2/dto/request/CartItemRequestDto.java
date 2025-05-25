@@ -15,8 +15,6 @@ public class CartItemRequestDto {
     private Long productId;
     @Schema(description = "수량", example = "3")
     private int quantity;
-    @Schema(description = "상품 가격", example = "9900.00")
-    private BigDecimal price;
     @Schema(description = "상품 사이즈", example = "260")
     private String size;
 
