@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import supercoding.pj2.security.JwtAuthenticationFilter;
 
 import java.util.List;
 
@@ -21,6 +23,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,7 +69,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         //  인증 없이 접근 가능한 API
-                                .requestMatchers("/api/**").permitAll()
+                                .requestMatchers("/api/v1/**").permitAll()
 
                         // multipart POST 명시적으로 허용
                         .requestMatchers(HttpMethod.POST, "/api/v1/products").permitAll()
@@ -76,6 +84,7 @@ public class SecurityConfig {
                         //  그 외는 인증 필요
                         .anyRequest().authenticated()
                 );
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
