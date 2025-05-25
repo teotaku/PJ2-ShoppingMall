@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import supercoding.pj2.dto.request.OrderRequestDto;
 import supercoding.pj2.dto.response.OrderItemResponseDto;
 import supercoding.pj2.dto.response.OrderResponseDto;
+import supercoding.pj2.security.CustomUserDetails;
 import supercoding.pj2.service.OrderService;
 import supercoding.pj2.service.UserService;
 @CrossOrigin(origins = "*")
@@ -39,7 +40,7 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "주문 조회",description = "파라미터로 pageable 받고 주문 조회")
     public ResponseEntity<Page<OrderResponseDto>> getOrders(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable) {
         Long userId = userService.findByEmail(userDetails.getUsername()).getId();
         Page<OrderResponseDto> result = orderService.getOrders(userId, pageable);

@@ -45,7 +45,7 @@ public class MyPageService {
             if (!orderItemList.isEmpty()) {
                 OrderItem orderItem = orderItemList.get(0); //첫 상품만 표시
 
-                RecentOrderDto.builder()
+                recentOrderDto = RecentOrderDto.builder()
                         .productName(orderItem.getName())
                         .price(orderItem.getPrice())
                         .color(orderItem.getColor())

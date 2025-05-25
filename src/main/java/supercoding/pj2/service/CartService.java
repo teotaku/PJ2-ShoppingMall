@@ -120,7 +120,6 @@ public class CartService {
         List<CartItemRequestDto> dtoItems = items.stream().map(item -> new CartItemRequestDto(
                 item.getProductId(),
                 item.getQuantity(),
-                item.getPrice(),
                 item.getSize()
         )).collect(Collectors.toList());
 

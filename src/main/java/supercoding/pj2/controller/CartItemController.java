@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import supercoding.pj2.dto.request.CartItemRequestDto;
 import supercoding.pj2.dto.response.CartItemResponseDto;
 import supercoding.pj2.entity.User;
+import supercoding.pj2.security.CustomUserDetails;
 import supercoding.pj2.service.CartService;
 import supercoding.pj2.service.UserService;
 @CrossOrigin(origins = "*")
@@ -58,7 +59,7 @@ public class CartItemController {
     //장바구니 결제 처리
     @Operation(summary = "장바구니 결제",description = "유저 아이디와 주소지를 받아서 로직처리")
     @PostMapping("/checkout")
-    public ResponseEntity<Void> checkout(@AuthenticationPrincipal UserDetails userDetails,String shippingAddress) {
+    public ResponseEntity<Void> checkout(@AuthenticationPrincipal CustomUserDetails userDetails, String shippingAddress) {
         Long userId = userService.findByEmail(userDetails.getUsername()).getId();
         cartService.checkout(userId,shippingAddress);
         return ResponseEntity.ok().build();
