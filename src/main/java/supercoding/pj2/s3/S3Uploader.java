@@ -50,7 +50,6 @@ public class S3Uploader {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
-                .acl(ObjectCannedACL.PUBLIC_READ)
                 .contentType(file.getContentType())
                 .build();
 

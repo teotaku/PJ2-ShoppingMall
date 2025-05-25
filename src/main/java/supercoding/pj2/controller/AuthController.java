@@ -15,7 +15,7 @@ import supercoding.pj2.dto.response.OAuthResponseDto;
 import supercoding.pj2.service.AuthService;
 import supercoding.pj2.service.UserService;
 import supercoding.pj2.service.VerificationService;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

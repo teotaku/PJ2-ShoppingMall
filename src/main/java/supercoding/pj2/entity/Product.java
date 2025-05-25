@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import supercoding.pj2.dto.request.ProductRequestDto;
 import supercoding.pj2.dto.response.ProductResponseDto;
+import supercoding.pj2.dto.response.ProductResponseSizeDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -28,16 +30,15 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal price;
 
-    private Integer stock;
 
     @Column(name = "category_id")
-    private Long categoryId;
+    @Builder.Default
+    private Long categoryId = 2L;
 
-    @Column(name = "size")
-    private String size; // 사이즈 추가
 
     @Column
-    private String color;
+    @Builder.Default
+    private String color = "사진참고";
 
     @Builder.Default
     private int viewCount = 0; //조회수
@@ -67,27 +68,24 @@ public class Product extends BaseEntity {
     public void update(ProductRequestDto dto) {
         if(dto.getName() != null) this.name = dto.getName();
         if(dto.getPrice() != null) this.price = dto.getPrice();
-        if(dto.getStock() != null) this.stock = dto.getStock();
         if(dto.getDescription() != null)this.description = dto.getDescription();
         if(dto.getCategoryId() != null)this.categoryId = dto.getCategoryId();
     }
 
-    public ProductResponseDto toDto() {
+    public ProductResponseDto toDto(List<ProductSize> sizes) {
         return ProductResponseDto.builder()
                 .id(this.id)
                 .name(this.name)
                 .price(this.price)
-                .stock(this.stock)
                 .description(this.description)
                 .imageUrl(this.imageUrl)
                 .viewCount(this.viewCount)
                 .purchaseCount(this.purchaseCount)
                 .popularityScore(this.getPopularityScore())
+                .sizes(sizes.stream()
+                        .map(s -> new ProductResponseSizeDto(s.getSize(),s.getStock()))
+                        .toList())
                 .build();
     }
 
-
-    public void decreaseStock(int quantity) {
-        this.stock -= quantity;
-    }
 }

@@ -2,6 +2,8 @@ package supercoding.pj2.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -17,7 +19,7 @@ import supercoding.pj2.s3.S3Uploader;
 import supercoding.pj2.service.ProductService;
 
 import java.io.IOException;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -56,14 +58,26 @@ public class ProductController {
     }
 
     //상품 등록
+    @Operation(
+            summary = "상품 등록 API",
+            description = """
+    multipart/form-data 형식으로 상품 정보를 등록합니다.  
+    - `ProductRequestDto`는 `@ModelAttribute`로 파싱됩니다.  
+    - 이미지 파일은 `image` 필드로 `MultipartFile`로 첨부해야 합니다.
+    
+     Swagger 사용 방법:
+    - `image`: 파일 탭에서 이미지 선택  
+    - 나머지 필드는 텍스트 입력  
+    - `sizes[0].size`, `sizes[0].stock` 형태로 사이즈 배열 입력 가능
+    """)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "상품 등록",description = "이미지와 상품 정보를 함께 받아 상품을 등록합니다.")
-    public ResponseEntity<Void> create(@RequestPart("dto") ProductRequestDto dto,
-                                       @RequestPart("image")MultipartFile image) throws IOException {
+    public ResponseEntity<Void> create(@ModelAttribute ProductRequestDto dto,
+                                       @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
 
-        String imageUrl = s3Uploader.upload(image);
-
-        dto.injectImageUrl(imageUrl);
+        if (image != null) {
+            String imageUrl = s3Uploader.upload(image);
+            dto.injectImageUrl(imageUrl);
+        }
 
         productService.createProduct(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -77,10 +91,19 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    //상품삭제
+    @DeleteMapping("/{id}")
+    @Operation(summary = "상품 삭제", description = "상품 id를 클라이언트가 전송하면 서버가 상품삭제")
+    public ResponseEntity<Void> delte(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
     //인기순,조회수,구매수 상품 조회(기본값 인기수)
     @GetMapping("/sorted")
-    @Operation(summary = "상품 인기수,조회수,구매수 정렬",description = "파라미터로 pageable(정렬조건) 받고 주문 조회")
+    @Operation(summary = "상품 인기수,조회수,구매수 정렬", description = "파라미터로 pageable(정렬조건) 받고 주문 조회")
     public ResponseEntity<Page<ProductResponseDto>> sorted(@ParameterObject ProductSearchCondition condition) {
+
         return ResponseEntity.ok(productService.getSortedProducts(condition));
 
     }
