@@ -18,7 +18,7 @@ public class NaverOAuthClient implements OAuthClient {
 
     private final String clientId = "NAVER_CLIENT_ID";
     private final String clientSecret = "NAVER_CLIENT_SECRET";
-    private final String redirectUri = "http://localhost:8080/api/v1/oauth/authorization/naver";
+    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/naver";
 
     @Override
     public String getAccessToken(String code) {

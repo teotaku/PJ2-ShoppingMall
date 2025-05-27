@@ -21,7 +21,7 @@ public class KaKaoOAuthClient implements OAuthClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String clientId = "KAKAO_CLIENT_ID";
-    private final String redirectUri = "http://localhost:8080/api/v1/oauth/authorization/kakao";
+    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/kakao";
 
     @Override
     public String getAccessToken(String code) {
