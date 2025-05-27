@@ -20,8 +20,8 @@ import supercoding.pj2.service.UserService;
 @RequiredArgsConstructor
 public class CartItemController {
 
-    private CartService cartService;
-    private UserService userService;
+    private final CartService cartService;
+    private final UserService userService;
 
     //장바구니 전체조회
     @Operation(summary = "장바구니 전체 조회",description = "장바구니 물품 전체 조회")
@@ -59,7 +59,7 @@ public class CartItemController {
     //장바구니 결제 처리
     @Operation(summary = "장바구니 결제",description = "유저 아이디와 주소지를 받아서 로직처리")
     @PostMapping("/checkout")
-    public ResponseEntity<Void> checkout(@AuthenticationPrincipal CustomUserDetails userDetails, String shippingAddress) {
+    public ResponseEntity<Void> checkout(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String shippingAddress) {
         Long userId = userService.findByEmail(userDetails.getUsername()).getId();
         cartService.checkout(userId,shippingAddress);
         return ResponseEntity.ok().build();
