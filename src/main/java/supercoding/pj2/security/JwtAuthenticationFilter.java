@@ -33,6 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 String token = authHeader.substring(7);
                 Long userId = jwtProvider.getUserIdFromToken(token);
+                System.out.println("🔑 토큰: " + token);
+                System.out.println("✅ 파싱된 userId: " + userId);
 
                 CustomUserDetails userDetails = userDetailsService.loadUserById(userId);
 
@@ -51,3 +53,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

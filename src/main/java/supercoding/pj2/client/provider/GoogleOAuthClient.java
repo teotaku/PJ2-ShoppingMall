@@ -18,7 +18,7 @@ public class GoogleOAuthClient implements OAuthClient {
 
     private final String clientId = "GOOGLE_CLIENT_ID";
     private final String clientSecret = "GOOGLE_CLIENT_SECRET";
-    private final String redirectUri = "http://localhost:8080/api/v1/oauth/authorization/google";
+    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/google";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
