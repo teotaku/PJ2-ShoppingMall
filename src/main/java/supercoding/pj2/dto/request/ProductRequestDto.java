@@ -3,12 +3,14 @@ package supercoding.pj2.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import supercoding.pj2.entity.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@NoArgsConstructor
 @Setter
 @Getter
 public class ProductRequestDto {

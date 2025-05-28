@@ -57,7 +57,7 @@ public class MyPageController {
     }
 
     //페이 조회
-    @GetMapping("/{userId}/balance")
+    @GetMapping("/balance")
     @Operation(summary = "페이 잔액 조회")
     public ResponseEntity<Long> getPayBalance(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userService.findByEmail(userDetails.getUsername()).getId();
@@ -66,7 +66,7 @@ public class MyPageController {
 
     //페이 충전
     @Operation(summary = "페이 충전",description = "파라미터로 페이충전 DTO(ChargeRequestDto)를 받고 페이충전")
-    @PostMapping("/{userId}/charge")
+    @PostMapping("/charge")
     public ResponseEntity<Void> chargePay(@AuthenticationPrincipal CustomUserDetails userDetails,
                                           @RequestBody ChargeRequestDto dto) {
         Long userId = userService.findByEmail(userDetails.getUsername()).getId();
