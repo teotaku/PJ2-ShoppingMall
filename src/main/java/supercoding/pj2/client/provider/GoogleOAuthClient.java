@@ -3,6 +3,7 @@ package supercoding.pj2.client.provider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,11 +16,16 @@ import supercoding.pj2.userinfo.OAuthUserInfo;
 public class GoogleOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-
-    private final String clientId = "GOOGLE_CLIENT_ID";
-    private final String clientSecret = "GOOGLE_CLIENT_SECRET";
-    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/google";
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${oauth.google.client-id}")
+    private String clientId;
+
+    @Value("${oauth.google.client-secret}")
+    private String clientSecret;
+
+    @Value("${oauth.google.redirect-uri}")
+    private String redirectUri;
 
     @Override
     public String getAccessToken(String code) {
