@@ -2,6 +2,7 @@ package supercoding.pj2.client.provider;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -16,9 +17,14 @@ public class NaverOAuthClient implements OAuthClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private final String clientId = "NAVER_CLIENT_ID";
-    private final String clientSecret = "NAVER_CLIENT_SECRET";
-    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/naver";
+    @Value("${oauth.kakao.client-id}")
+    private String clientId;
+
+    @Value("${oauth.kakao.client-secret}")
+    private String clientSecret;
+
+    @Value("${oauth.kakao.redirect-uri}")
+    private String redirectUri;
 
     @Override
     public String getAccessToken(String code) {
@@ -26,6 +32,7 @@ public class NaverOAuthClient implements OAuthClient {
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
+                .queryParam("client_url", redirectUri)
                 .queryParam("code", code)
                 .queryParam("state", "random")  // 실제 서비스에선 state 검증 필요
                 .build().toUriString();
