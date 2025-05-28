@@ -3,6 +3,7 @@ package supercoding.pj2.client.provider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -20,8 +21,14 @@ public class KaKaoOAuthClient implements OAuthClient {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String clientId = "KAKAO_CLIENT_ID";
-    private final String redirectUri = "http://52.79.184.1:8080/api/v1/oauth/authorization/kakao";
+    @Value("${oauth.kakao.client-id}")
+    private String clientId;
+
+    @Value("${oauth.kakao.client-secret}")
+    private String clientSecret;
+
+    @Value("${oauth.kakao.redirect-uri}")
+    private String redirectUri;
 
     @Override
     public String getAccessToken(String code) {
@@ -33,6 +40,7 @@ public class KaKaoOAuthClient implements OAuthClient {
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", "authorization_code");
         params.put("client_id", clientId);
+        params.put("client_secret", clientSecret);
         params.put("redirect_uri", redirectUri);
         params.put("code", code);
 
