@@ -3,10 +3,12 @@ package supercoding.pj2.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+@NoArgsConstructor
 @Setter
 @Getter
 @Schema(description = "상품 검색 조건")

@@ -49,6 +49,8 @@ public class MyPageService {
                         .productName(orderItem.getName())
                         .price(orderItem.getPrice())
                         .color(orderItem.getColor())
+                        .imageUrl(orderItem.getImageUrl())
+                        .size(orderItem.getSize())
                         .quantity(orderItem.getQuantity())
                         .build();
             }
