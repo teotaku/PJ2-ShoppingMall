@@ -1,6 +1,7 @@
 package supercoding.pj2.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import supercoding.pj2.client.OAuthClient;
@@ -17,6 +18,7 @@ import supercoding.pj2.repository.UserRepository;
 import supercoding.pj2.security.JwtProvider;
 import supercoding.pj2.userinfo.OAuthUserInfo;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {

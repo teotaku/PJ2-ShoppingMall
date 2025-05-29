@@ -35,43 +35,42 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //  강제 적용되는 CORS 필터 등록 (보안 필터보다 먼저 실행됨)
+    // 강제적 CORS 필터 등록 (Spring Security 필터보다 먼저 적용)
     @Bean(name = "corsFilterCustom")
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // ★ 정확한 origin 명시
+        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔥 프론트 주소 명시
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ★ 명시적 허용
-        config.setMaxAge(3600L); // ★ preflight 캐시 시간 설정
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-        bean.setOrder(0);
-        return bean;}
+        bean.setOrder(0); // 가장 먼저 적용
+        return bean;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-
-                .cors(withDefaults()) // 🔥 이거 꼭 필요함!
+                .cors(withDefaults()) //  CORS 허용 반드시 필요
 
                 .authorizeHttpRequests(auth -> auth
 
-                        //  Swagger 허용
+                        //  Swagger 문서 허용
                         .requestMatchers(
                                 "/swagger-ui.html", "/swagger-ui/**",
                                 "/v3/api-docs", "/v3/api-docs/**",
                                 "/api-docs", "/api-docs/**"
                         ).permitAll()
 
-                        //  인증 없이 접근 가능한 API
-                                .requestMatchers("/api/v1/**").permitAll()
-
-                        // multipart POST 명시적으로 허용
+                        // 인증 없이 허용할 API
+                        .requestMatchers("/api/v1/products/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/products").permitAll()
 
                         //  정적 리소스 허용
@@ -79,11 +78,14 @@ public class SecurityConfig {
                                 "/", "/index.html", "/favicon.ico",
                                 "/static/**", "/assets/**", "/css/**", "/js/**", "/images/**"
                         ).permitAll()
-                        //  프리플라이트 OPTIONS 요청 허용
+
+                        // 프리플라이트 OPTIONS 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        //  그 외는 인증 필요
+
+                        //  나머지는 인증 필요
                         .anyRequest().authenticated()
                 );
+
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

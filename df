@@ -1,0 +1,500 @@
+[1mdiff --git a/build.gradle b/build.gradle[m
+[1mindex bf83eb5..de4cbd0 100644[m
+[1m--- a/build.gradle[m
+[1m+++ b/build.gradle[m
+[36m@@ -37,6 +37,9 @@[m [mdependencies {[m
+ 	testImplementation 'org.springframework.security:spring-security-test'[m
+ 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'[m
+ [m
+[32m+[m
+[32m+[m	[32mimplementation 'org.springframework.boot:spring-boot-starter-security'[m
+[32m+[m
+ 	implementation 'org.springframework.boot:spring-boot-starter-web'[m
+ 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'[m
+ [m
+[1mdiff --git a/src/main/java/supercoding/pj2/Pj2Application.java b/src/main/java/supercoding/pj2/Pj2Application.java[m
+[1mindex 578e932..79ba9b8 100644[m
+[1m--- a/src/main/java/supercoding/pj2/Pj2Application.java[m
+[1m+++ b/src/main/java/supercoding/pj2/Pj2Application.java[m
+[36m@@ -2,16 +2,21 @@[m [mpackage supercoding.pj2;[m
+ [m
+ import io.github.cdimascio.dotenv.Dotenv;[m
+ import org.springframework.boot.SpringApplication;[m
+[32m+[m[32mimport org.springframework.boot.autoconfigure.EnableAutoConfiguration;[m
+ import org.springframework.boot.autoconfigure.SpringBootApplication;[m
+[32m+[m[32mimport org.springframework.boot.context.properties.ConfigurationProperties;[m
+[32m+[m[32mimport org.springframework.boot.context.properties.EnableConfigurationProperties;[m
+ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;[m
+[32m+[m[32mimport supercoding.pj2.s3.AwsS3Properties;[m
+ [m
+[32m+[m[32m@EnableConfigurationProperties(AwsS3Properties.class)[m
+ @EnableJpaAuditing[m
+ @SpringBootApplication[m
+ public class Pj2Application {[m
+ [m
+ 	public static void main(String[] args) {[m
+[31m-		System.setProperty("AWS_ACCESS_KEY", System.getenv("AWS_ACCESS_KEY"));[m
+[31m-		System.setProperty("AWS_SECRET_KEY", System.getenv("AWS_SECRET_KEY"));[m
+[32m+[m[32m//		System.setProperty("AWS_ACCESS_KEY", System.getenv("AWS_ACCESS_KEY"));[m
+[32m+[m[32m//		System.setProperty("AWS_SECRET_KEY", System.getenv("AWS_SECRET_KEY"));[m
+ [m
+ 		SpringApplication.run(Pj2Application.class, args);[m
+ [m
+[1mdiff --git a/src/main/java/supercoding/pj2/config/SecurityConfig.java b/src/main/java/supercoding/pj2/config/SecurityConfig.java[m
+[1mindex 97ec0cd..95f3ef3 100644[m
+[1m--- a/src/main/java/supercoding/pj2/config/SecurityConfig.java[m
+[1m+++ b/src/main/java/supercoding/pj2/config/SecurityConfig.java[m
+[36m@@ -67,9 +67,10 @@[m [mpublic class SecurityConfig {[m
+                                 "/v3/api-docs", "/v3/api-docs/**",[m
+                                 "/api-docs", "/api-docs/**"[m
+                         ).permitAll()[m
+[31m-[m
+                         //  인증 없이 접근 가능한 API[m
+[31m-                                .requestMatchers("/api/v1/**").permitAll()[m
+[32m+[m[32m                        .requestMatchers("/api/v1/mypage/**").authenticated() // **보다 뒤에있으면 무시돼서 null값[m
+[32m+[m[32m                        .requestMatchers("/api/v1/auth/**").permitAll()[m
+[32m+[m[32m                        .requestMatchers("/api/v1/cart/**").authenticated()[m
+ [m
+                         // multipart POST 명시적으로 허용[m
+                         .requestMatchers(HttpMethod.POST, "/api/v1/products").permitAll()[m
+[36m@@ -81,6 +82,8 @@[m [mpublic class SecurityConfig {[m
+                         ).permitAll()[m
+                         //  프리플라이트 OPTIONS 요청 허용[m
+                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()[m
+[32m+[m
+[32m+[m[32m                        .requestMatchers("/api/v1/**").permitAll()[m
+                         //  그 외는 인증 필요[m
+                         .anyRequest().authenticated()[m
+                 );[m
+[1mdiff --git a/src/main/java/supercoding/pj2/controller/CartItemController.java b/src/main/java/supercoding/pj2/controller/CartItemController.java[m
+[1mindex 611dba4..5092f13 100644[m
+[1m--- a/src/main/java/supercoding/pj2/controller/CartItemController.java[m
+[1m+++ b/src/main/java/supercoding/pj2/controller/CartItemController.java[m
+[36m@@ -20,8 +20,8 @@[m [mimport supercoding.pj2.service.UserService;[m
+ @RequiredArgsConstructor[m
+ public class CartItemController {[m
+ [m
+[31m-    private CartService cartService;[m
+[31m-    private UserService userService;[m
+[32m+[m[32m    private final CartService cartService;[m
+[32m+[m[32m    private final UserService userService;[m
+ [m
+     //장바구니 전체조회[m
+     @Operation(summary = "장바구니 전체 조회",description = "장바구니 물품 전체 조회")[m
+[1mdiff --git a/src/main/java/supercoding/pj2/controller/MyPageController.java b/src/main/java/supercoding/pj2/controller/MyPageController.java[m
+[1mindex 1172818..1f8e544 100644[m
+[1m--- a/src/main/java/supercoding/pj2/controller/MyPageController.java[m
+[1m+++ b/src/main/java/supercoding/pj2/controller/MyPageController.java[m
+[36m@@ -33,7 +33,7 @@[m [mpublic class MyPageController {[m
+     @GetMapping[m
+     @Operation(summary = "마이페이지 내 정보 조회")[m
+     public ResponseEntity<UserResponseDto> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {[m
+[31m-        Long userId = userService.findByEmail(userDetails.getUsername()).getId();[m
+[32m+[m[32m        Long userId =userDetails.getUser().getId();[m
+         return ResponseEntity.ok(myPageService.getMyInfo(userId));[m
+     }[m
+ [m
+[1mdiff --git a/src/main/java/supercoding/pj2/dto/request/ProductRequestDto.java b/src/main/java/supercoding/pj2/dto/request/ProductRequestDto.java[m
+[1mindex ff289d8..3023a35 100644[m
+[1m--- a/src/main/java/supercoding/pj2/dto/request/ProductRequestDto.java[m
+[1m+++ b/src/main/java/supercoding/pj2/dto/request/ProductRequestDto.java[m
+[36m@@ -3,6 +3,7 @@[m [mpackage supercoding.pj2.dto.request;[m
+ [m
+ import io.swagger.v3.oas.annotations.media.Schema;[m
+ import lombok.Getter;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+ import lombok.Setter;[m
+ import supercoding.pj2.entity.Product;[m
+ [m
+[36m@@ -11,6 +12,7 @@[m [mimport java.util.List;[m
+ [m
+ @Setter[m
+ @Getter[m
+[32m+[m[32m@NoArgsConstructor[m
+ public class ProductRequestDto {[m
+ [m
+     @Schema(description = "상품 이름", example = "조던1 레트로")[m
+[36m@@ -26,7 +28,7 @@[m [mpublic class ProductRequestDto {[m
+     private String description;[m
+ [m
+     @Schema(description = "색상", example = "Black/Red")[m
+[31m-    private String color;[m
+[32m+[m[32m    private String color = "사진참고";[m
+ [m
+     @Schema(description = "이미지 URL", example = "https://cdn.example.com/images/jordan1.jpg")[m
+     private String imageUrl;[m
+[1mdiff --git a/src/main/java/supercoding/pj2/dto/request/ProductRequestSizeDto.java b/src/main/java/supercoding/pj2/dto/request/ProductRequestSizeDto.java[m
+[1mindex fcadb53..7fed984 100644[m
+[1m--- a/src/main/java/supercoding/pj2/dto/request/ProductRequestSizeDto.java[m
+[1m+++ b/src/main/java/supercoding/pj2/dto/request/ProductRequestSizeDto.java[m
+[36m@@ -2,7 +2,11 @@[m [mpackage supercoding.pj2.dto.request;[m
+ [m
+ import io.swagger.v3.oas.annotations.media.Schema;[m
+ import lombok.Getter;[m
+[32m+[m[32mimport lombok.NoArgsConstructor;[m
+[32m+[m[32mimport lombok.Setter;[m
+ [m
+[32m+[m[32m@NoArgsConstructor[m
+[32m+[m[32m@Setter[m
+ @Getter[m
+ public class ProductRequestSizeDto {[m
+ [m
+[36m@@ -10,5 +14,5 @@[m [mpublic class ProductRequestSizeDto {[m
+     private String size;[m
+ [m
+     @Schema(description = "해당 사이즈 재고", example = "7")[m
+[31m-    private int stock;[m
+[32m+[m[32m    private Integer stock;[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main/java/supercoding/pj2/dto/response/OrderItemResponseDto.java b/src/main/java/supercoding/pj2/dto/response/OrderItemResponseDto.java[m
+[1mindex 2a58cbf..dee77e6 100644[m
+[1m--- a/src/main/java/supercoding/pj2/dto/response/OrderItemResponseDto.java[m
+[1m+++ b/src/main/java/supercoding/pj2/dto/response/OrderItemResponseDto.java[m
+[36m@@ -15,5 +15,6 @@[m [mpublic class OrderItemResponseDto {[m
+     private BigDecimal price;[m
+     private int quantity;[m
+     private String color;[m
+[32m+[m[32m    private String size;[m
+ [m
+ }[m
+[1mdiff --git a/src/main/java/supercoding/pj2/entity/Cart.java b/src/main/java/supercoding/pj2/entity/Cart.java[m
+[1mindex e11865a..ade5fd0 100644[m
+[1m--- a/src/main/java/supercoding/pj2/entity/Cart.java[m
+[1m+++ b/src/main/java/supercoding/pj2/entity/Cart.java[m
+[36m@@ -14,8 +14,6 @@[m [mpublic class Cart extends BaseEntity {[m
+     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)[m
+     private Long id;[m
+ [m
+[31m-    @Column(name = "cart_id")[m
+[31m-    private Long cartId;[m
+     @Column(name = "user_id")[m
+     private Long userId;[m
+ [m
+[1mdiff --git a/src/main/java/supercoding/pj2/entity/OrderItem.java b/src/main/java/supercoding/pj2/entity/OrderItem.java[m
+[1mindex 3ae87f5..3562416 100644[m
+[1m--- a/src/main/java/supercoding/pj2/entity/OrderItem.java[m
+[1m+++ b/src/main/java/supercoding/pj2/entity/OrderItem.java[m
+[36m@@ -4,7 +4,6 @@[m [mpackage supercoding.pj2.entity;[m
+ import jakarta.persistence.*;[m
+ import lombok.*;[m
+ import supercoding.pj2.dto.response.OrderItemResponseDto;[m
+[31m-import supercoding.pj2.dto.response.ProductResponseDto;[m
+ [m
+ import java.math.BigDecimal;[m
+ [m
+[36m@@ -33,6 +32,9 @@[m [mpublic class OrderItem extends BaseEntity{[m
+     @Column(nullable = false)[m
+     private BigDecimal price;[m
+ [m
+[32m+[m[32m    private String size;[m
+[32m+[m
+[32m+[m
+     public OrderItemResponseDto toDto() {[m
+         return OrderItemResponseDto.builder()[m
+                 .name(this.name)[m
+[36m@@ -40,6 +42,7 @@[m [mpublic class OrderItem extends BaseEntity{[m
+                 .price(this.price)[m
+                 .quantity(this.quantity)[m
+                 .color(color)[m
+[32m+[m[32m                .size(size)[m
+                 .build();[m
+     }[m
+ [m
+[1mdiff --git a/src/main/java/supercoding/pj2/s3/AwsS3Properties.java b/src/main/java/supercoding/pj2/s3/AwsS3Properties.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2d3aab6[m
+[1m--- /dev/null[m
+[1m+++ b/src/main/java/supercoding/pj2/s3/AwsS3Properties.java[m
+[36m@@ -0,0 +1,59 @@[m
+[32m+[m[32mpackage supercoding.pj2.s3;[m
+[32m+[m
+[32m+[m[32mimport lombok.Getter;[m
+[32m+[m[32mimport lombok.Setter;[m
+[32m+[m[32mimport org.springframework.boot.context.properties.ConfigurationProperties;[m
+[32m+[m[32mimport org.springframework.context.annotation.Configuration;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m *  AWS S3 관련 설정을 yml에서 자동으로 매핑해주는 설정 클래스[m
+[32m+[m[32m * - cloud.aws.* 구조의 설정 값을 객체 형태로 주입받기 위해 사용[m
+[32m+[m[32m * - @ConfigurationProperties를 사용하면 yml 구조를 그대로 유지하면서[m
+[32m+[m[32m *   타입 안전하게 값을 주입받을 수 있음[m
+[32m+[m[32m */[m
+[32m+[m[32m@ConfigurationProperties(prefix = "cloud.aws")[m
+[32m+[m[32m@Getter[m
+[32m+[m[32m@Setter[m
+[32m+[m[32mpublic class AwsS3Properties {[m
+[32m+[m
+[32m+[m[32m    // cloud.aws.credentials.*[m
+[32m+[m[32m    private Credentials credentials;[m
+[32m+[m
+[32m+[m[32m    // cloud.aws.region.*[m
+[32m+[m[32m    private Region region;[m
+[32m+[m
+[32m+[m[32m    // cloud.aws.s3.*[m
+[32m+[m[32m    private S3 s3;[m
+[32m+[m
+[32m+[m[32m    /**[m
+[32m+[m[32m     *  credentials 관련 설정[m
+[32m+[m[32m     * cloud.aws.credentials.access-key[m
+[32m+[m[32m     * cloud.aws.credentials.secret-key[m
+[32m+[m[32m     */[m
+[32m+[m[32m    @Getter[m
+[32m+[m[32m    @Setter[m
+[32m+[m[32m    public static class Credentials {[m
+[32m+[m[32m        private String accessKey; // AWS_ACCESS_KEY 환경변수로부터 주입됨[m
+[32m+[m[32m        private String secretKey; // AWS_SECRET_KEY 환경변수로부터 주입됨[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    /**[m
+[32m+[m[32m     * region 설정[m
+[32m+[m[32m     * cloud.aws.region.static[m
+[32m+[m[32m     */[m
+[32m+[m[32m    @Getter[m
+[32m+[m[32m    @Setter[m
+[32m+[m[32m    public static class Region {[m
+[32m+[m[32m        private String staticRegion; // AWS 리전 정보 (예: ap-northeast-2)[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    /**[m
+[32m+[m[32m     *  S3 관련 설정[m
+[32m+[m[32m     * cloud.aws.s3.bucket[m
+[32m+[m[32m     */[m
+[32m+[m[32m    @Getter[m
+[32m+[m[32m    @Setter[m
+[32m+[m[32m    public static class S3 {[m
+[32m+[m[32m        private String bucket; // 버킷 이름[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[1mdiff --git a/src/main/java/supercoding/pj2/s3/S3Uploader.java b/src/main/java/supercoding/pj2/s3/S3Uploader.java[m
+[1mindex f2c07c7..5310c24 100644[m
+[1m--- a/src/main/java/supercoding/pj2/s3/S3Uploader.java[m
+[1m+++ b/src/main/java/supercoding/pj2/s3/S3Uploader.java[m
+[36m@@ -2,7 +2,6 @@[m [mpackage supercoding.pj2.s3;[m
+ [m
+ import jakarta.annotation.PostConstruct;[m
+ import lombok.RequiredArgsConstructor;[m
+[31m-import org.springframework.beans.factory.annotation.Value;[m
+ import org.springframework.stereotype.Component;[m
+ import org.springframework.web.multipart.MultipartFile;[m
+ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;[m
+[36m@@ -14,47 +13,48 @@[m [mimport software.amazon.awssdk.services.s3.model.ObjectCannedACL;[m
+ import software.amazon.awssdk.core.sync.RequestBody;[m
+ [m
+ import java.io.IOException;[m
+[31m-import java.net.URI;[m
+ import java.util.UUID;[m
+ [m
+ @Component[m
+ @RequiredArgsConstructor[m
+ public class S3Uploader {[m
+ [m
+[31m-    @Value("${cloud.aws.credentials.access-key}")[m
+[31m-    private String accessKey;[m
+[31m-[m
+[31m-    @Value("${cloud.aws.credentials.secret-key}")[m
+[31m-    private String secretKey;[m
+[31m-[m
+[31m-    @Value("${cloud.aws.region.static}")[m
+[31m-    private String region;[m
+[31m-[m
+[31m-    @Value("${cloud.aws.s3.bucket}")[m
+[31m-    private String bucketName;[m
+[31m-[m
+[32m+[m[32m    private final AwsS3Properties awsProps;[m
+     private S3Client s3Client;[m
+ [m
+     @PostConstruct[m
+[31m-    public void initializeAmazon() {[m
+[32m+[m[32m    public void init() {[m
+         s3Client = S3Client.builder()[m
+[31m-                .region(Region.of(region))[m
+[32m+[m[32m                .region(Region.of(awsProps.getRegion().getStaticRegion()))[m
+                 .credentialsProvider(StaticCredentialsProvider.create([m
+[31m-                        AwsBasicCredentials.create(accessKey, secretKey)))[m
+[32m+[m[32m                        AwsBasicCredentials.create([m
+[32m+[m[32m                                awsProps.getCredentials().getAccessKey(),[m
+[32m+[m[32m                                awsProps.getCredentials().getSecretKey()[m
+[32m+[m[32m                        )[m
+[32m+[m[32m                ))[m
+                 .build();[m
+     }[m
+ [m
+     public String upload(MultipartFile file) throws IOException {[m
+[31m-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();[m
+[32m+[m[32m        String originalName = file.getOriginalFilename();[m
+[32m+[m[32m        String safeFileName = UUID.randomUUID() + "_" +[m
+[32m+[m[32m                (originalName != null ? originalName.replaceAll("[^a-zA-Z0-9.]", "_") : "file");[m
+ [m
+         PutObjectRequest request = PutObjectRequest.builder()[m
+[31m-                .bucket(bucketName)[m
+[31m-                .key(fileName)[m
+[32m+[m[32m                .bucket(awsProps.getS3().getBucket())[m
+[32m+[m[32m                .key(safeFileName)[m
+                 .contentType(file.getContentType())[m
+                 .build();[m
+ [m
+[31m-        s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));[m
+[32m+[m[32m        } catch (Exception e) {[m
+[32m+[m[32m            System.out.println(" S3 업로드 중 에러 발생: " + e.getMessage());[m
+[32m+[m[32m            e.printStackTrace();[m
+[32m+[m[32m            throw new IOException("S3 업로드 실패", e);[m
+[32m+[m[32m        }[m
+ [m
+[31m-        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileName;[m
+[32m+[m[32m        return "https://" + awsProps.getS3().getBucket() + ".s3." +[m
+[32m+[m[32m                awsProps.getRegion().getStaticRegion() + ".amazonaws.com/" + safeFileName;[m
+     }[m
+ }[m
+[1mdiff --git a/src/main/java/supercoding/pj2/security/JwtAuthenticationFilter.java b/src/main/java/supercoding/pj2/security/JwtAuthenticationFilter.java[m
+[1mindex d4f1bf2..ba33b1e 100644[m
+[1m--- a/src/main/java/supercoding/pj2/security/JwtAuthenticationFilter.java[m
+[1m+++ b/src/main/java/supercoding/pj2/security/JwtAuthenticationFilter.java[m
+[36m@@ -50,4 +50,8 @@[m [mpublic class JwtAuthenticationFilter extends OncePerRequestFilter {[m
+ [m
+         filterChain.doFilter(request, response);[m
+     }[m
+[32m+[m
+ }[m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/src/main/java/supercoding/pj2/service/CartService.java b/src/main/java/supercoding/pj2/service/CartService.java[m
+[1mindex 3569f76..92e0ee2 100644[m
+[1m--- a/src/main/java/supercoding/pj2/service/CartService.java[m
+[1m+++ b/src/main/java/supercoding/pj2/service/CartService.java[m
+[36m@@ -45,10 +45,11 @@[m [mpublic class CartService {[m
+ [m
+ [m
+         CartItem item = CartItem.builder()[m
+[31m-                .cartId(cart.getCartId())[m
+[32m+[m[32m                .cartId(cart.getId())[m
+                 .productId(product.getId())[m
+                 .price(product.getPrice())[m
+                 .quantity(dto.getQuantity())[m
+[32m+[m[32m                .size(dto.getSize())[m
+                 .build();[m
+         cartItemRepository.save(item);[m
+ [m
+[36m@@ -60,7 +61,7 @@[m [mpublic class CartService {[m
+         Cart cart = cartRepository.findByUserId(userId)[m
+                 .orElseThrow(() -> new NotFoundException("장바구니가 없습니다."));[m
+ [m
+[31m-        List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getCartId());[m
+[32m+[m[32m        List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getId());[m
+ [m
+         List<Long> productIds = cartItemList.stream()[m
+                 .map(CartItem::getProductId)[m
+[36m@@ -75,6 +76,7 @@[m [mpublic class CartService {[m
+                 .map(item -> {[m
+                     Product product = productMap.get(item.getProductId());[m
+                     return CartItemResponseDto.builder()[m
+[32m+[m[32m                            .id(item.getId())[m
+                             .productId(product.getId())[m
+                             .name(product.getName())[m
+                             .color(product.getColor())[m
+[1mdiff --git a/src/main/java/supercoding/pj2/service/MyPageService.java b/src/main/java/supercoding/pj2/service/MyPageService.java[m
+[1mindex 9aca1b0..3128923 100644[m
+[1m--- a/src/main/java/supercoding/pj2/service/MyPageService.java[m
+[1m+++ b/src/main/java/supercoding/pj2/service/MyPageService.java[m
+[36m@@ -49,6 +49,7 @@[m [mpublic class MyPageService {[m
+                         .productName(orderItem.getName())[m
+                         .price(orderItem.getPrice())[m
+                         .color(orderItem.getColor())[m
+[32m+[m[32m                        .imageUrl(orderItem.getImageUrl())[m
+                         .quantity(orderItem.getQuantity())[m
+                         .build();[m
+             }[m
+[1mdiff --git a/src/main/java/supercoding/pj2/service/OrderService.java b/src/main/java/supercoding/pj2/service/OrderService.java[m
+[1mindex 747643e..db54493 100644[m
+[1m--- a/src/main/java/supercoding/pj2/service/OrderService.java[m
+[1m+++ b/src/main/java/supercoding/pj2/service/OrderService.java[m
+[36m@@ -1,6 +1,7 @@[m
+ package supercoding.pj2.service;[m
+ [m
+ import lombok.RequiredArgsConstructor;[m
+[32m+[m[32mimport lombok.extern.slf4j.Slf4j;[m
+ import org.springframework.data.domain.Page;[m
+ import org.springframework.data.domain.PageImpl;[m
+ import org.springframework.data.domain.Pageable;[m
+[36m@@ -10,15 +11,18 @@[m [mimport supercoding.pj2.dto.request.CartItemRequestDto;[m
+ import supercoding.pj2.dto.response.OrderItemResponseDto;[m
+ import supercoding.pj2.dto.response.OrderResponseDto;[m
+ import supercoding.pj2.entity.*;[m
+[32m+[m[32mimport supercoding.pj2.exception.NotFoundException;[m
+ import supercoding.pj2.repository.OrderItemRepository;[m
+ import supercoding.pj2.repository.OrderRepository;[m
+ import supercoding.pj2.repository.ProductRepository;[m
+[32m+[m[32mimport supercoding.pj2.repository.ProductSizeRepository;[m
+ [m
+ import java.util.List;[m
+ import java.util.Map;[m
+ import java.util.function.Function;[m
+ import java.util.stream.Collectors;[m
+ [m
+[32m+[m[32m@Slf4j[m
+ @Transactional[m
+ @Service[m
+ @RequiredArgsConstructor[m
+[36m@@ -27,6 +31,7 @@[m [mpublic class OrderService {[m
+     private final OrderRepository orderRepository;[m
+     private final ProductRepository productRepository;[m
+     private final OrderItemRepository orderItemRepository;[m
+[32m+[m[32m    private final ProductSizeRepository productSizeRepository;[m
+ [m
+     //주문생성[m
+     public void createOrder(Long userId, List<CartItemRequestDto> items , String shippingAddress) {[m
+[36m@@ -37,6 +42,7 @@[m [mpublic class OrderService {[m
+                 .build();[m
+ [m
+         orderRepository.save(order);[m
+[32m+[m[32m        log.info("Order 저장 완료, ID: {}", order.getId());[m
+ [m
+         List<Long> productIds = items.stream()[m
+                 .map(CartItemRequestDto::getProductId)[m
+[36m@@ -49,6 +55,14 @@[m [mpublic class OrderService {[m
+         List<OrderItem> orderItems = items.stream()[m
+                 .map(item -> {[m
+                     Product product = productMap.get(item.getProductId());[m
+[32m+[m[32m                    if (product == null) {[m
+[32m+[m[32m                        throw new IllegalArgumentException("상품 정보 없음: " + item.getProductId());[m
+[32m+[m[32m                    }[m
+[32m+[m
+[32m+[m[32m                    ProductSize productSize = productSizeRepository.findByProductIdAndSize(item.getProductId(), item.getSize())[m
+[32m+[m[32m                            .orElseThrow(() -> new NotFoundException("해당 상품 사이즈 정보 없음"));[m
+[32m+[m
+[32m+[m
+                     return OrderItem.builder()[m
+                             .orderId(order.getId())[m
+                             .productId(product.getId())[m
+[36m@@ -57,9 +71,15 @@[m [mpublic class OrderService {[m
+                             .imageUrl(product.getImageUrl())[m
+                             .color(product.getColor())[m
+                             .price(product.getPrice())[m
+[32m+[m[32m                            .size(productSize.getSize())[m
+                             .build();[m
+                 }).toList();[m
+[32m+[m[32m        if (orderItems.isEmpty()) {[m
+[32m+[m[32m            throw new IllegalArgumentException("주문 상품 리스트가 비어있습니다.");[m
+[32m+[m[32m        }[m
+[32m+[m
+         orderItemRepository.saveAll(orderItems);[m
+[32m+[m[32m        log.info("OrderItem 저장 시도, 개수: {}", orderItems.size());[m
+     }[m
+ [m
+ [m
+[1mdiff --git a/src/main/resources/application.yml b/src/main/resources/application.yml[m
+[1mindex 5592cd4..1058d02 100644[m
+[1m--- a/src/main/resources/application.yml[m
+[1m+++ b/src/main/resources/application.yml[m
+[36m@@ -40,6 +40,6 @@[m [mcloud:[m
+             access-key: ${AWS_ACCESS_KEY}[m
+             secret-key: ${AWS_SECRET_KEY}[m
+         region:[m
+[31m-            static: ap-northeast-2[m
+[32m+[m[32m            staticRegion: ${AWS_REGION}[m
+         s3:[m
+             bucket: supercodingpj2-static-files[m
+\ No newline at end of file[m

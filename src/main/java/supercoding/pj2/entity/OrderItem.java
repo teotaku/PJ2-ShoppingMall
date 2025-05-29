@@ -33,6 +33,8 @@ public class OrderItem extends BaseEntity{
     @Column(nullable = false)
     private BigDecimal price;
 
+    private String size;
+
     public OrderItemResponseDto toDto() {
         return OrderItemResponseDto.builder()
                 .name(this.name)
@@ -40,6 +42,7 @@ public class OrderItem extends BaseEntity{
                 .price(this.price)
                 .quantity(this.quantity)
                 .color(color)
+                .size(size)
                 .build();
     }
 

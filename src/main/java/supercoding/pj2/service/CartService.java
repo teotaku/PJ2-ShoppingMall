@@ -45,10 +45,11 @@ public class CartService {
 
 
         CartItem item = CartItem.builder()
-                .cartId(cart.getCartId())
+                .cartId(cart.getId())
                 .productId(product.getId())
                 .price(product.getPrice())
                 .quantity(dto.getQuantity())
+                .size(dto.getSize())
                 .build();
         cartItemRepository.save(item);
 
@@ -60,7 +61,7 @@ public class CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("장바구니가 없습니다."));
 
-        List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getCartId());
+        List<CartItem> cartItemList = cartItemRepository.findByCartId(cart.getId());
 
         List<Long> productIds = cartItemList.stream()
                 .map(CartItem::getProductId)

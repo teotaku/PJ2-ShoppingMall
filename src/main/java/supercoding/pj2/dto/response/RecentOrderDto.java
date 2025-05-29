@@ -16,5 +16,6 @@ public class RecentOrderDto {
     private String color;
     private int quantity;
     private BigDecimal price;
+    private String size;
 
 }
