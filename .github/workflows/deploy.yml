@@ -18,6 +18,9 @@ jobs:
           script_stop: true
           script: | 
             cd /home/ubuntu/app/BE
+            
+            echo "org.gradle.java.installations.auto-download=true" > gradle.properties
+
             git pull origin main
             ./gradlew clean build -x test
             sudo fuser -k -n tcp 8080 || true
