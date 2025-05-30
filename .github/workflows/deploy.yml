@@ -19,6 +19,9 @@ jobs:
           script: | 
             cd /home/ubuntu/app/BE
             
+            export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+            export PATH=$JAVA_HOME/bin:$PATH
+            
             echo "org.gradle.java.installations.auto-download=true" > gradle.properties
 
             git pull origin main
