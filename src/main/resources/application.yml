@@ -3,9 +3,9 @@ server:
 
 spring:
     datasource:
-        url: jdbc:mysql://supercodingpj2-db.c3mauekkk9cl.ap-northeast-2.rds.amazonaws.com:3306/supercodingpj2
-        username: admin
-        password: codingpj
+        url: ${SPRING_DATASOURCE_URL}
+        username: ${SPRING_DATASOURCE_USERNAME}
+        password: ${SPRING_DATASOURCE_PASSWORD}
 
     jpa:
         hibernate:
