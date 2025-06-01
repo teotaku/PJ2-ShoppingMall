@@ -51,7 +51,7 @@ jobs:
         run: cat build/reports/tests/test/classes/supercoding.pj2.Pj2ApplicationTests.html || echo "클래스 리포트 없음"
 
       - name: 빌드된 파일 이름 변경하기
-        run: mv ./build/libs/*SNAPSOHT.jar ./project.jar
+        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
 
       - name: SCP로 EC2에 빌드된 파일 전송하기
         uses: appleboy/scp-action@v0.1.7
