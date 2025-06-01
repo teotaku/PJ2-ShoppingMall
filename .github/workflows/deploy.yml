@@ -61,7 +61,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC@_PRIVATE_KEY }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
             rm -rf /home/ubuntu/app/BE/current
