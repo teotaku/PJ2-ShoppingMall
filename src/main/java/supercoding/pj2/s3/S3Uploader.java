@@ -15,7 +15,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.util.UUID;
-@ConfigurationProperties
+@Component
 //@Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "cloud.aws.enabled", havingValue = "true", matchIfMissing = false)
