@@ -71,15 +71,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
-            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
-            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-            export SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}
-            export SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}
-            export SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-            export GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            export GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+           
             rm -rf /home/ubuntu/BE/current
             mkdir /home/ubuntu/BE/current
             mv /home/ubuntu/BE/tobe/project.jar /home/ubuntu/BE/current/project.jar
