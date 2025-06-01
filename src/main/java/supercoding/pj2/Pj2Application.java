@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import supercoding.pj2.s3.AwsS3Properties;
 
-//@EnableConfigurationProperties(AwsS3Properties.class)
+@EnableConfigurationProperties(AwsS3Properties.class)
 @EnableJpaAuditing
 @SpringBootApplication
 public class Pj2Application {
