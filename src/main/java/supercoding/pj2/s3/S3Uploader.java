@@ -15,8 +15,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "cloud.aws.enabled", havingValue = "true", matchIfMissing = false)
+//@ConditionalOnProperty(name = "cloud.aws.enabled", havingValue = "true", matchIfMissing = false)
 public class S3Uploader {
 
     private final AwsS3Properties awsProps;
