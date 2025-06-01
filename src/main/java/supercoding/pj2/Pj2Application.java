@@ -19,13 +19,13 @@ public class Pj2Application {
 		SpringApplication.run(Pj2Application.class, args);
 	}
 
-//	@Bean
-//	public CommandLineRunner checkAll(ApplicationContext ctx) {
-//		return args -> {
-//			System.out.println("===== 등록된 Bean 목록 =====");
-//			for (String name : ctx.getBeanDefinitionNames()) {
-//				System.out.println(name);
-//			}
-//		};
-//	}
+	@Bean
+	public CommandLineRunner checkAll(ApplicationContext ctx) {
+		return args -> {
+			System.out.println("===== 등록된 Bean 목록 =====");
+			for (String name : ctx.getBeanDefinitionNames()) {
+				System.out.println(name);
+			}
+		};
+	}
 }
