@@ -3,6 +3,7 @@ package supercoding.pj2.s3;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -14,7 +15,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.util.UUID;
-
+@ConfigurationProperties
 //@Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "cloud.aws.enabled", havingValue = "true", matchIfMissing = false)
