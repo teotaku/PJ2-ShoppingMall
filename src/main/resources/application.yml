@@ -36,13 +36,13 @@ springdoc:
 #s3
 cloud:
     aws:
+        enabled: true
         credentials:
             access-key: ${AWS_ACCESS_KEY}
             secret-key: ${AWS_SECRET_KEY}
         region:
             staticRegion: ${AWS_REGION}
         s3:
-
             bucket: ${AWS_BUCKET_NAME}
 
 oauth:
