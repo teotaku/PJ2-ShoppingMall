@@ -1,0 +1,10 @@
+cloud:
+  aws:
+    enabled: true
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    region:
+      staticRegion: ap-northeast-2
+    s3:
+      bucket: test-bucket
