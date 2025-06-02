@@ -40,7 +40,7 @@ public class SecurityConfig {
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔥 프론트 주소 명시
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://52.79.184.1:8080")); // 🔥 프론트 주소 명시
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setMaxAge(3600L);
