@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Component
+//@Component
 @ConfigurationProperties(prefix = "cloud.aws")
 public class AwsS3Properties {
 
