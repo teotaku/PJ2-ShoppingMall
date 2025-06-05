@@ -55,7 +55,7 @@ jobs:
 
       - name: Docker 이미지 빌드 및 ECR 푸시
         env:
-          ECR_REGISTRY: 396913706736.dkr.ecr.ap-northeast-2.amazonaws.com
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: supercodingpj2-server
           IMAGE_TAG: ${{ github.sha }}
         run: |
