@@ -77,7 +77,7 @@ jobs:
             echo "[2] AWS ECR 로그인 (자격 임시 저장)"
             aws ecr get-login-password --region ap-northeast-2 \
               | docker login --username AWS \
-                --password-stdin ${{ steps.login-ecr.outputs.registry }} \
+                --password-stdin ${{ steps.login-ecr.outputs.registry }} 
                 
 
             echo "[3] 기존 컨테이너 종료 및 제거"
