@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import supercoding.pj2.security.JwtAuthenticationFilter;
@@ -35,29 +36,46 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 강제적 CORS 필터 등록 (Spring Security 필터보다 먼저 적용)
-    @Bean(name = "corsFilterCustom")
-    public FilterRegistrationBean<CorsFilter> corsFilter() {
+
+    @Bean
+    public CorsConfigurationSource corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // 🔥 프론트 주소 명시
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://52.79.184.1:8080"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
-        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-        bean.setOrder(0); // 가장 먼저 적용
-        return bean;
+        return source;
     }
+
+
+//
+//    // 강제적 CORS 필터 등록 (Spring Security 필터보다 먼저 적용)
+//    @Bean(name = "corsFilterCustom")
+//    public FilterRegistrationBean<CorsFilter> corsFilter() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.setAllowedOrigins(List.of("http://localhost:3000", "http://52.79.184.1:8080")); // 🔥 프론트 주소 명시
+//        config.setAllowedHeaders(List.of("*"));
+//        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        config.setMaxAge(3600L);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//
+//        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+//        bean.setOrder(0); // 가장 먼저 적용
+//        return bean;
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(withDefaults()) //  CORS 허용 반드시 필요
+                .cors(cors -> cors.configurationSource(corsConfiguration()))
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -90,4 +108,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
