@@ -70,12 +70,27 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
-            docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+            echo "[1] 임시 Docker config 디렉토리 생성"
+            mkdir -p /tmp/.docker
+            echo '{}' > /tmp/.docker/config.json
+
+            echo "[2] AWS ECR 로그인 (자격 임시 저장)"
+            aws ecr get-login-password --region ap-northeast-2 \
+              | docker login --username AWS \
+                --password-stdin ${{ steps.login-ecr.outputs.registry }} \
+                --config /tmp/.docker
+
+            echo "[3] 기존 컨테이너 종료 및 제거"
             docker stop app-container || true
             docker rm app-container || true
-            docker run -d --name app-container -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
-          
+
+            echo "[4] 최신 이미지 Pull"
+            docker pull --config /tmp/.docker ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+
+            echo "[5] 새 컨테이너 실행"
+            docker run -d --name app-container -p 8080:8080 \
+              --config /tmp/.docker \
+              ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
 
 
 
