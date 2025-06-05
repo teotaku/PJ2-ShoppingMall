@@ -8,6 +8,6 @@ public class BasicController {
 
     @GetMapping("/")
     public String index() {
-        return "쇼핑몰 2차 프로젝트2  INDEX화면. 스웨거 - > http://52.79.184.1:8080/swagger-ui/index.html";
+        return "쇼핑몰 2차 프로젝트23  INDEX화면. 스웨거 - > http://52.79.184.1:8080/swagger-ui/index.html";
     }
 }
