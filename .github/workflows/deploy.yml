@@ -75,8 +75,8 @@ jobs:
             echo '{}' > /tmp/.docker/config.json
 
             echo "[2] AWS ECR 로그인 (자격 임시 저장)"
-            aws ecr get-login-password --region ap-northeast-2 \
-              | docker login --username AWS \
+            DOCKER_CONFIG=/tmp/.docker aws ecr get-login-password --region ap-northeast-2 \
+             | docker login --username AWS \
                 --password-stdin ${{ steps.login-ecr.outputs.registry }} 
                 
 
