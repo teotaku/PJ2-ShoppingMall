@@ -55,7 +55,7 @@ jobs:
 
       - name: Docker 이미지 빌드 및 ECR 푸시
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: 396913706736.dkr.ecr.ap-northeast-2.amazonaws.com
           ECR_REPOSITORY: supercodingpj2-server
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -70,6 +70,14 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
+            
+            echo "[1] 디버깅: 실제 레지스트리 주소 확인"
+            echo "${{ steps.login-ecr.outputs.registry }}"   # ← 실제 치환된 값 찍어보기
+
+            echo "[2] 디버깅: 풀 경로 확인"
+            echo "${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}"  # ← 풀 대상 경로 확인
+            
+            
             echo "[1] AWS ECR 로그인"
             DOCKER_CONFIG=/dev/null  aws ecr get-login-password --region ap-northeast-2 \
              | docker login --username AWS \
