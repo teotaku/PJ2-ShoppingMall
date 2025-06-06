@@ -79,9 +79,10 @@ jobs:
             
             
             echo "[1] AWS ECR 로그인"
-            DOCKER_CONFIG=/dev/null  aws ecr get-login-password --region ap-northeast-2 \
+            aws ecr get-login-password --region ap-northeast-2 \
              | docker login --username AWS \
-             --password-stdin ${{ steps.login-ecr.outputs.registry }}
+             --password-stdin \
+            ${{ steps.login-ecr.outputs.registry }}
 
             echo "[2] 기존 컨테이너 종료 및 제거"
             docker stop app-container || true
