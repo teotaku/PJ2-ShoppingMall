@@ -77,7 +77,7 @@ jobs:
             echo "[2] 디버깅: 풀 경로 확인"
             echo "${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}"  # ← 풀 대상 경로 확인
             
-            
+            export PATH=$PATH:/home/ubuntu/.local/bin
             echo "[1] AWS ECR 로그인"
             aws ecr get-login-password --region ap-northeast-2 \
              | docker login --username AWS \
