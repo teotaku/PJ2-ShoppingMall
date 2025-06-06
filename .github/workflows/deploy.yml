@@ -55,7 +55,7 @@ jobs:
 
       - name: Docker 이미지 빌드 및 ECR 푸시
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} #이 부분 바인딩 안될 가능성있음.그럴땐 변수값이 아닌 하드코딩필요할수도.
           ECR_REPOSITORY: supercodingpj2-server
           IMAGE_TAG: ${{ github.sha }}
         run: |
