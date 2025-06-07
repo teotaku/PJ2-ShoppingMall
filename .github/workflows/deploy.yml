@@ -70,11 +70,10 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            
-            docker stop supercodingpj2-server || true
-            docker rm supercodingpj2-server || true
-            docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
-            docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+           sudo docker stop supercodingpj2-server || true
+           sudo docker rm supercodingpj2-server || true
+           sudo docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+           sudo docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
             
             
             
