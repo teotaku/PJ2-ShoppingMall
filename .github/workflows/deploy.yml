@@ -59,8 +59,8 @@ jobs:
           ECR_REPOSITORY: supercodingpj2-server
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/supercodingpj2-server:$latest .
-          docker push $ECR_REGISTRY/supercodingpj2-server:$latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$latest
 
       - name: SSH로 EC2에 접속하여 Docker 이미지 실행
         uses: appleboy/ssh-action@v1.0.3
