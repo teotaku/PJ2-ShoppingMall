@@ -43,7 +43,7 @@ jobs:
         run: docker build -t supercodingpj2-server .
 
       - name: Docker 이미지에 Tag 붙이기
-        run: docker tag instagram-server ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+        run: docker tag supercodingpj2-server ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
 
       - name: ECR에 Docker 이미지 Push하기
         run: docker push ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
