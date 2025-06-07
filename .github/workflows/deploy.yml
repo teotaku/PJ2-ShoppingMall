@@ -7,14 +7,11 @@ on:
 
 
 jobs:
-  Deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Github Repository에 올린 파일들 불러오기
+      - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
-
-      - name: gradlew에 실행 권한 부여
-        run: chmod +x gradlew
 
       - name: JDK 17버전 설치
         uses: actions/setup-java@v4
@@ -22,61 +19,44 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: application.yml 생성
-        run: |
-          echo "$APPLICATION_PROPERTIES" > src/main/resources/application.yml
-        env:
-          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+      - name: application.yml 파일 만들기
+        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
 
       - name: 테스트 및 빌드하기
-        run: ./gradlew clean build -stacktrace
+        run: ./gradlew clean build
 
-      - name: 테스트 실패 상세 로그 출력 (정확한 Bean 에러 확인용)
-        if: failure()
-        run: cat build/reports/tests/test/classes/supercoding.pj2.Pj2ApplicationTests.html || echo "클래스 리포트 없음"
-
-      - name: application.yml 확인
-        run: cat src/main/resources/application.yml
-
-      # ✅ ✅ ✅ 새로 추가: AWS ECR 인증을 위한 IAM 키 등록
-      # AWS에 인증된 상태 ( 깃헙 액션이 AWS CLI인증 로그인상태 )
-      - name: AWS 자격 증명 설정
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # 깃헙 시크릿에 등록된 값
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # 깃헙 시크릿에 등록된 값
           aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # ✅ ✅ ✅ 새로 추가: Docker → ECR 로그인 (ID/PW 없이 IAM 인증 기반으로 토큰 발급받아 로그인함)
-      # 위에 인증된상태를 기반으로 amazon-ecr-login이
-      - name: Amazon ECR 로그인
+      - name: ECR에 로그인하기
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Docker 이미지 빌드 및 ECR 푸시
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} #이 부분 바인딩 안될 가능성있음.그럴땐 변수값이 아닌 하드코딩필요할수도.
-          ECR_REPOSITORY: supercodingpj2-server
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$latest
+      - name: Docker 이미지 생성
+        run: docker build -t supercodingpj2-server .
 
-      - name: SSH로 EC2에 접속하여 Docker 이미지 실행
+      - name: Docker 이미지에 Tag 붙이기
+        run: docker tag instagram-server ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+
+      - name: ECR에 Docker 이미지 Push하기
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+
+      - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-          
-           aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 396913706736.dkr.ecr.ap-northeast-2.amazonaws.com
-           docker stop supercodingpj2-server || true
-           docker rm supercodingpj2-server || true
-           docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
-           docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
-            
+            docker stop supercodingpj2-server || true
+            docker rm supercodingpj2-server || true
+            docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+            docker run -d --name instagram-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
             
             
 #            echo "[1] 디버깅: 실제 레지스트리 주소 확인"
