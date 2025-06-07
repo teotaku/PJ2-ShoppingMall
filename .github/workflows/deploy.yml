@@ -57,10 +57,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} #이 부분 바인딩 안될 가능성있음.그럴땐 변수값이 아닌 하드코딩필요할수도.
           ECR_REPOSITORY: supercodingpj2-server
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/supercodingpj2-server:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/supercodingpj2-server:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/supercodingpj2-server:$latest .
+          docker push $ECR_REGISTRY/supercodingpj2-server:$latest
 
       - name: SSH로 EC2에 접속하여 Docker 이미지 실행
         uses: appleboy/ssh-action@v1.0.3
@@ -72,10 +72,10 @@ jobs:
           script: |
           
            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 396913706736.dkr.ecr.ap-northeast-2.amazonaws.com
-           sudo docker stop supercodingpj2-server || true
-           sudo docker rm supercodingpj2-server || true
-           sudo docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
-           sudo docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+           docker stop supercodingpj2-server || true
+           docker rm supercodingpj2-server || true
+           docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+           docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
             
             
             
