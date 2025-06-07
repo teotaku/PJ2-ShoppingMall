@@ -59,8 +59,8 @@ jobs:
           ECR_REPOSITORY: supercodingpj2-server
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/supercodingpj2-server:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/supercodingpj2-server:$IMAGE_TAG
 
       - name: SSH로 EC2에 접속하여 Docker 이미지 실행
         uses: appleboy/ssh-action@v1.0.3
@@ -71,28 +71,35 @@ jobs:
           script_stop: true
           script: |
             
-            echo "[1] 디버깅: 실제 레지스트리 주소 확인"
-            echo "${{ steps.login-ecr.outputs.registry }}"   # ← 실제 치환된 값 찍어보기
-
-            echo "[2] 디버깅: 풀 경로 확인"
-            echo "${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}"  # ← 풀 대상 경로 확인
-            
-            export PATH=$PATH:/home/ubuntu/.local/bin
-            echo "[1] AWS ECR 로그인"
-            aws ecr get-login-password --region ap-northeast-2 \
-             | docker login --username AWS \
-             --password-stdin \
-            ${{ steps.login-ecr.outputs.registry }}
-
-            echo "[2] 기존 컨테이너 종료 및 제거"
-            docker stop app-container || true
-            docker rm app-container || true
-
-            echo "[3] 최신 이미지 Pull"
+            docker stop supercodingpj2-server || true
+            docker rm supercodingpj2-server || true
             docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
-
-            echo "[4] 새 컨테이너 실행"
-            docker run -d --name app-container -p 8080:8080 \
-             ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
-
+            docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+            
+            
+            
+#            echo "[1] 디버깅: 실제 레지스트리 주소 확인"
+#            echo "${{ steps.login-ecr.outputs.registry }}"
+#
+#            echo "[2] 디버깅: 풀 경로 확인"
+#            echo "${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}"
+#
+#            export PATH=$PATH:/home/ubuntu/.local/bin
+#            echo "[1] AWS ECR 로그인"
+#            aws ecr get-login-password --region ap-northeast-2 \
+#             | docker login --username AWS \
+#             --password-stdin \
+#            ${{ steps.login-ecr.outputs.registry }}
+#
+#            echo "[2] 기존 컨테이너 종료 및 제거"
+#            docker stop app-container || true
+#            docker rm app-container || true
+#
+#            echo "[3] 최신 이미지 Pull"
+#            docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+#
+#            echo "[4] 새 컨테이너 실행"
+#            docker run -d --name app-container -p 8080:8080 \
+#             ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:${{ github.sha }}
+#
 
