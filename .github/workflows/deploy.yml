@@ -59,7 +59,7 @@ jobs:
             docker stop supercodingpj2-server || true
             docker rm supercodingpj2-server || true
             docker pull ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
-            docker run -d --name instagram-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
+            docker run -d --name supercodingpj2-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/supercodingpj2-server:latest
             
             
 #            echo "[1] 디버깅: 실제 레지스트리 주소 확인"
