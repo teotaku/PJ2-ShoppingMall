@@ -123,10 +123,10 @@ S3Uploaderなどの外部サービスは @Profile("test") でMock化し、安全
 
 
 🗓️ 開発期間
-2024年5月 ～ 2024年6月（約4週間）
+2025年5月 ～ 2025年6月（約4週間）
 
 👤 開発者
-名前: 이동익（Lee Dong Ik）
+名前: 이동익 イ・ドンイク（Lee Dong Ik）
 
 Email: dongki9467@naver.com
 
